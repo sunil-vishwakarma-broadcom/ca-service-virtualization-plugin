@@ -1,0 +1,31 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:f="/lib/form"
+  xmlns:j="jelly:core" xmlns:c="/lib/credentials">
+  <!--Check tags here: http://reports.jenkins.io/reports/core-taglib/jelly-taglib-ref.html-->
+  <f:block>
+    <f:entry field="vseName" title="${%VseName}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="vsNames" title="${%VsNames}">
+      <f:textarea/>
+    </f:entry>
+  </f:block>
+
+  <f:block>
+    <table>
+      <f:optionalBlock checked="${instance.useCustomRegistry}" field="useCustomRegistry"
+        inline="true"
+        name="useCustomRegistry" title="${%CustomRegistry}">
+        <f:entry field="host" title="${%RegistryHost}">
+          <f:textbox/>
+        </f:entry>
+        <f:entry field="port" title="${%Port}">
+          <f:textbox default="1505"/>
+        </f:entry>
+        <f:entry title="${%CredentialId}" field="tokenCredentialId" name="tokenCredentialId">
+              <c:select/>
+        </f:entry>
+      </f:optionalBlock>
+    </table>
+  </f:block>
+</j:jelly>

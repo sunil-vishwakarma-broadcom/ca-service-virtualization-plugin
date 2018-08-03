@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<invokeResult>
+  <method name="RunTest">
+    <params>
+      <param name="stagingDocPath" value="examples/StagingDocs/1user1cycle0think.stg"/>
+      <param name="coordName" value="Coordinator"/>
+      <param name="configPath" value=""/>
+      <param name="testCasePath" value="examples/Tests/AccountControlMDB.tst"/>
+      <param name="callbackKey" value="64343533653737312D343765312D3439"/>
+    </params>
+  </method>
+  <status>OK</status>
+  <result>
+    <status>ENDED</status>
+    <reportUrl>
+      <![CDATA[htp://localhost:1505/index.html?lisaPortal=reporting/printPreview_functional.html#Idstr=61653261643936342D613636392D3435&curtstr=T]]></reportUrl>
+    <runId>61653261643936342D613636392D3435</runId>
+    <pass count="1"/>
+    <fail count="0"/>
+    <warning count="0"/>
+    <error count="0"/>
+    <message>AccountControlMDB,Run1User1Cycle0Think</message>
+  </result>
+</invokeResult>

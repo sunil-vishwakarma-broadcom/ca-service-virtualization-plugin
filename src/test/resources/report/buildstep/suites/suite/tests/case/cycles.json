@@ -1,0 +1,222 @@
+{
+  "_links": {
+    "self": {
+      "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles"
+    }
+  },
+  "count": 10,
+  "_embedded": {
+    "CycleHistory": [
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/442F2822E5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "442F2822E5B211E7B46E020027E349EE",
+        "cycle": "0",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:06-0500",
+        "endTime": "2017-12-20T13:19:11-0500",
+        "elapsedTimeInMillSec": 4443,
+        "endedState": "FAILED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/46D568F3E5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "46D568F3E5B211E7B46E020027E349EE",
+        "cycle": "1",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:11-0500",
+        "endTime": "2017-12-20T13:19:16-0500",
+        "elapsedTimeInMillSec": 4839,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/49B7EF79E5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "49B7EF79E5B211E7B46E020027E349EE",
+        "cycle": "2",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:16-0500",
+        "endTime": "2017-12-20T13:19:21-0500",
+        "elapsedTimeInMillSec": 4964,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4CAD88CCE5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "4CAD88CCE5B211E7B46E020027E349EE",
+        "cycle": "3",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:21-0500",
+        "endTime": "2017-12-20T13:19:25-0500",
+        "elapsedTimeInMillSec": 4772,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4F85FD2FE5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "4F85FD2FE5B211E7B46E020027E349EE",
+        "cycle": "4",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:25-0500",
+        "endTime": "2017-12-20T13:19:30-0500",
+        "elapsedTimeInMillSec": 4679,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/525040C2E5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "525040C2E5B211E7B46E020027E349EE",
+        "cycle": "5",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:30-0500",
+        "endTime": "2017-12-20T13:19:34-0500",
+        "elapsedTimeInMillSec": 4124,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/54C5AD95E5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "54C5AD95E5B211E7B46E020027E349EE",
+        "cycle": "6",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:34-0500",
+        "endTime": "2017-12-20T13:19:39-0500",
+        "elapsedTimeInMillSec": 5105,
+        "endedState": "FAILED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/57D0CAB8E5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "57D0CAB8E5B211E7B46E020027E349EE",
+        "cycle": "7",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:39-0500",
+        "endTime": "2017-12-20T13:19:44-0500",
+        "elapsedTimeInMillSec": 4426,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5A744C6DE5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "5A744C6DE5B211E7B46E020027E349EE",
+        "cycle": "8",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:44-0500",
+        "endTime": "2017-12-20T13:19:48-0500",
+        "elapsedTimeInMillSec": 4630,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5D373D00E5B211E7B46E020027E349EE"
+          }
+        },
+        "cycleUniqueId": "5D373D00E5B211E7B46E020027E349EE",
+        "cycle": "9",
+        "run": "test-data-driven-http-rest [Run1User10Cycle]",
+        "simulator": "tcp://localhost:2014/Simulator",
+        "startTime": "2017-12-20T13:19:48-0500",
+        "endTime": "2017-12-20T13:19:53-0500",
+        "elapsedTimeInMillSec": 4470,
+        "endedState": "PASSED",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      }
+    ]
+  }
+}

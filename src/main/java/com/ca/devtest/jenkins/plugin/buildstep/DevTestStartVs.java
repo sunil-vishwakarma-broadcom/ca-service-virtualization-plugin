@@ -62,7 +62,7 @@ public class DevTestStartVs extends DefaultBuildStep {
 
 	private String vseName;
 	private List<String> vsNames;
-
+	private String separator;
 
 	/**
 	 * Constructor.
@@ -73,17 +73,20 @@ public class DevTestStartVs extends DefaultBuildStep {
 	 * @param vseName           name of VSE where we want to undeploy the VS
 	 * @param vsNames           names of the VSs delimetered by ,
 	 * @param tokenCredentialId credentials token id
+	 * @param secured           if https should be for custom registry
 	 */
 	@DataBoundConstructor
 	public DevTestStartVs(boolean useCustomRegistry, String host, String port, String vseName,
-			String vsNames, String tokenCredentialId) {
-		super(useCustomRegistry, host, port, tokenCredentialId);
+			String vsNames, String tokenCredentialId, boolean secured) {
+		super(useCustomRegistry, host, port, tokenCredentialId, secured);
 		this.vseName = vseName;
 		if (vsNames != null && !vsNames.isEmpty()) {
 			if (vsNames.contains(",")) {
 				this.vsNames = Arrays.asList(vsNames.split("\\s*,\\s*"));
+				this.separator = ", ";
 			} else {
 				this.vsNames = Arrays.asList(vsNames.split("\\s*\n\\s*"));
+				this.separator = "\n";
 			}
 		} else {
 			this.vsNames = new ArrayList<String>();
@@ -95,7 +98,7 @@ public class DevTestStartVs extends DefaultBuildStep {
 	}
 
 	public String getVsNames() {
-		return StringUtils.join(vsNames, "\n");
+		return StringUtils.join(vsNames, separator);
 	}
 
 	@Override
@@ -104,17 +107,24 @@ public class DevTestStartVs extends DefaultBuildStep {
 			throws InterruptedException, IOException {
 		Utils.checkRegistryEndpoint(this);
 		String currentHost = isUseCustomRegistry() ? super.getHost()
-				: DevTestPluginConfiguration.get().getResolvedHost();
+				: DevTestPluginConfiguration.get().getHost();
 		currentHost = Utils.resolveParameter(currentHost, run, listener);
 
 		String currentPort = isUseCustomRegistry() ? super.getPort()
-				: DevTestPluginConfiguration.get().getResolvedPort();
+				: DevTestPluginConfiguration.get().getPort();
 		currentPort = Utils.resolveParameter(currentPort, run, listener);
 
 		String currentUsername = isUseCustomRegistry() ? super.getUsername()
 				: DevTestPluginConfiguration.get().getUsername();
 		String currentPassword = isUseCustomRegistry() ? super.getPassword().getPlainText()
 				: DevTestPluginConfiguration.get().getPassword().getPlainText();
+
+		String currentProtocol;
+		if (isUseCustomRegistry()) {
+			currentProtocol = isSecured() ? "https://" : "http://";
+		} else {
+			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
+		}
 
 		if (vseName == null || vseName.isEmpty()) {
 			throw new AbortException(Messages.DevTestPlugin_emptyVseName());
@@ -135,7 +145,7 @@ public class DevTestStartVs extends DefaultBuildStep {
 
 			String urlPath = "/api/Dcm/VSEs/" + resolvedVseName + "/" + vsName + "/actions/start/";
 
-			HttpPost httpPost = new HttpPost("http://" + currentHost + ":" + currentPort + urlPath);
+			HttpPost httpPost = new HttpPost(currentProtocol + currentHost + ":" + currentPort + urlPath);
 			httpPost.addHeader("Authorization", createBasicAuthHeader(currentUsername, currentPassword));
 			httpPost.addHeader("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
 

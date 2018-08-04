@@ -53,32 +53,12 @@ public class DevTestPluginTest extends AbstractDevTestBuildStepTest {
 		setupJenkinsConfiguration("10.0.0.1", "1111", "user", "password", "token");
 		DevTestPluginDescriptor plugin = new DevTestPluginDescriptor();
 
-		assertEquals(plugin.getResolvedHost(), "10.0.0.1");
-		assertEquals(plugin.getResolvedPort(), "1111");
+		assertEquals(plugin.getHost(), "10.0.0.1");
+		assertEquals(plugin.getPort(), "1111");
 		StandardUsernamePasswordCredentials jenkinsCredentials = Utils
 				.lookupCredentials("token");
 		assertEquals(jenkinsCredentials.getUsername(), "user");
 		assertEquals(jenkinsCredentials.getPassword(), Secret.fromString("password"));
-
-	}
-
-	@Test
-	public void testConfigurePluginWithEnvironmentVariables() throws Exception {
-		Jenkins.getInstance().getGlobalNodeProperties().replaceBy(
-				Collections.singleton(new EnvironmentVariablesNodeProperty(
-						new Entry("host", "1.1.1.1"), new Entry("port", "6666"))));
-
-		setupJenkinsConfiguration("${host}", "${port}", "user", "password", "token");
-
-		DevTestPluginDescriptor plugin = new DevTestPluginDescriptor();
-
-		assertEquals(plugin.getResolvedHost(), "1.1.1.1");
-		assertEquals(plugin.getResolvedPort(), "6666");
-		StandardUsernamePasswordCredentials jenkinsCredentials = Utils
-				.lookupCredentials("token");
-		assertEquals(jenkinsCredentials.getUsername(), "user");
-		assertEquals(jenkinsCredentials.getPassword(), Secret.fromString("password"));
-
 	}
 
 	@Test
@@ -98,7 +78,7 @@ public class DevTestPluginTest extends AbstractDevTestBuildStepTest {
 
 	private DevTestStartVs createPlugin(boolean useCustomRegistry, String host, String port,
 			String vseName, String vsName, String tokenId) {
-		return new DevTestStartVs(useCustomRegistry, host, port, vseName, vsName, tokenId);
+		return new DevTestStartVs(useCustomRegistry, host, port, vseName, vsName, tokenId, false);
 	}
 
 }

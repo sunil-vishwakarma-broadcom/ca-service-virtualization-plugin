@@ -312,6 +312,6 @@ public class DevTestDeployVsTest extends AbstractDevTestBuildStepTest {
 
 	private DevTestDeployVs createPlugin(boolean useCustomRegistry, String host, String port,
 			String vseName, String marFilesPaths, String tokenId) {
-		return new DevTestDeployVs(useCustomRegistry, host, port, vseName, marFilesPaths, tokenId);
+		return new DevTestDeployVs(useCustomRegistry, host, port, vseName, marFilesPaths, tokenId, false);
 	}
 }

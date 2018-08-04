@@ -51,6 +51,7 @@ public abstract class DefaultBuildStep extends Builder implements SimpleBuildSte
 	private final String username;
 	private final Secret password;
 	private final String tokenCredentialId;
+	private boolean secured;
 
 	/**
 	 * Constructor.
@@ -59,13 +60,15 @@ public abstract class DefaultBuildStep extends Builder implements SimpleBuildSte
 	 * @param host              host for custom Registry
 	 * @param port              port for custom Registry
 	 * @param tokenCredentialId credentials token id
+	 * @param secured           if https should be for custom registry
 	 */
 	public DefaultBuildStep(boolean useCustomRegistry, String host, String port,
-			String tokenCredentialId) {
+			String tokenCredentialId, boolean secured) {
 		this.useCustomRegistry = useCustomRegistry;
 		this.host = host;
 		this.port = port;
 		this.tokenCredentialId = tokenCredentialId;
+		this.secured = secured;
 		StandardUsernamePasswordCredentials jenkinsCredentials = Utils
 				.lookupCredentials(this.tokenCredentialId);
 		if (jenkinsCredentials != null) {
@@ -99,6 +102,10 @@ public abstract class DefaultBuildStep extends Builder implements SimpleBuildSte
 
 	public String getTokenCredentialId() {
 		return tokenCredentialId;
+	}
+
+	public boolean isSecured() {
+		return secured;
 	}
 
 	@Override

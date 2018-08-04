@@ -71,6 +71,7 @@ public class DevTestDeployVs extends DefaultBuildStep {
 	private List<String> marFilesPaths;
 	private String vseName;
 	private String urlPath;
+	private String separator;
 
 	/**
 	 * Constructor.
@@ -81,16 +82,19 @@ public class DevTestDeployVs extends DefaultBuildStep {
 	 * @param vseName           name of VSE where we want to undeploy the VS
 	 * @param marFilesPaths     path to mar file
 	 * @param tokenCredentialId credentials token id
+	 * @param secured           if https should be for custom registry
 	 */
 	@DataBoundConstructor
 	public DevTestDeployVs(boolean useCustomRegistry, String host, String port, String vseName,
-			String marFilesPaths, String tokenCredentialId) {
-		super(useCustomRegistry, host, port, tokenCredentialId);
+			String marFilesPaths, String tokenCredentialId, boolean secured) {
+		super(useCustomRegistry, host, port, tokenCredentialId, secured);
 		if (marFilesPaths != null && !marFilesPaths.isEmpty()) {
 			if (marFilesPaths.contains(",")) {
 				this.marFilesPaths = Arrays.asList(marFilesPaths.split("\\s*,\\s*"));
+				this.separator = ", ";
 			} else {
 				this.marFilesPaths = Arrays.asList(marFilesPaths.split("\\s*\n\\s*"));
+				this.separator = "\n";
 			}
 		} else {
 			this.marFilesPaths = new ArrayList<String>();
@@ -99,7 +103,7 @@ public class DevTestDeployVs extends DefaultBuildStep {
 	}
 
 	public String getMarFilesPaths() {
-		return StringUtils.join(marFilesPaths, "\n");
+		return StringUtils.join(marFilesPaths, separator);
 	}
 
 	public String getVseName() {
@@ -119,14 +123,21 @@ public class DevTestDeployVs extends DefaultBuildStep {
 		}
 
 		String currentHost = isUseCustomRegistry() ? super.getHost()
-				: DevTestPluginConfiguration.get().getResolvedHost();
+				: DevTestPluginConfiguration.get().getHost();
 
 		currentHost = Utils.resolveParameter(currentHost, run, listener);
 
 		String currentPort = isUseCustomRegistry() ? super.getPort()
-				: DevTestPluginConfiguration.get().getResolvedPort();
+				: DevTestPluginConfiguration.get().getPort();
 
 		currentPort = Utils.resolveParameter(currentPort, run, listener);
+
+		String currentProtocol;
+		if (isUseCustomRegistry()) {
+			currentProtocol = isSecured() ? "https://" : "http://";
+		} else {
+			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
+		}
 
 		String currentUsername = isUseCustomRegistry() ? super.getUsername()
 				: DevTestPluginConfiguration.get().getUsername();
@@ -145,7 +156,7 @@ public class DevTestDeployVs extends DefaultBuildStep {
 							.println(Messages.DevTestPlugin_devTestLocation(currentHost, currentPort));
 
 			HttpEntity entity = createPostEntity(workspace, listener, marFilePath);
-			HttpPost httpPost = new HttpPost("http://" + currentHost + ":" + currentPort + urlPath);
+			HttpPost httpPost = new HttpPost(currentProtocol + currentHost + ":" + currentPort + urlPath);
 			httpPost.addHeader("Authorization", createBasicAuthHeader(currentUsername, currentPassword));
 			httpPost.addHeader("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
 			httpPost.setEntity(entity);

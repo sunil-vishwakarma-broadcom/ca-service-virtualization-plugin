@@ -25,6 +25,10 @@
         <f:entry title="${%CredentialId}" field="tokenCredentialId" name="tokenCredentialId">
               <c:select/>
         </f:entry>
+        <f:entry title="${%Secured}" field="secured" name="secured">
+          <f:checkbox default="false">
+          </f:checkbox>
+        </f:entry>
       </f:optionalBlock>
     </table>
   </f:block>

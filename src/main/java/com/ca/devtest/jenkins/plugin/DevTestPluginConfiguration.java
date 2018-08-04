@@ -51,6 +51,7 @@ import org.apache.http.util.EntityUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 /**
  * Main point for DevTest plugin in jenkins used by all build and post-build steps. This class
@@ -87,10 +88,9 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 
 		private String host = "";
 		private String port = "";
-		private String resolvedHost = "";
-		private String resolvedPort = "";
 		private String username = "";
 		private Secret password;
+		private boolean secured = false;
 		private String tokenCredentialId;
 
 		/**
@@ -111,9 +111,6 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 		public DevTestPluginDescriptor(String host, String port) {
 			this.host = host;
 			this.port = port;
-
-			this.resolvedHost = Utils.resolveParameterFromGlobalConfiguration(host);
-			this.resolvedPort = Utils.resolveParameterFromGlobalConfiguration(port);
 		}
 
 		@Override
@@ -123,9 +120,9 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 			this.port = formData.getJSONObject("DevTestPluginConfiguration").getString("port");
 			this.tokenCredentialId = formData.getJSONObject("DevTestPluginConfiguration")
 																			 .getString("tokenCredentialId");
+			this.secured = Boolean
+					.valueOf(formData.getJSONObject("DevTestPluginConfiguration").getString("secured"));
 
-			this.resolvedHost = Utils.resolveParameterFromGlobalConfiguration(host);
-			this.resolvedPort = Utils.resolveParameterFromGlobalConfiguration(port);
 			StandardUsernamePasswordCredentials credentials = Utils
 					.lookupCredentials(this.tokenCredentialId);
 			if (credentials != null) {
@@ -146,19 +143,23 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 		 * @param host              host
 		 * @param port              port
 		 * @param tokenCredentialId tokenCredentialId
+		 * @param secured           if https should be used
 		 *
 		 * @return form validation
 		 */
+		@POST
 		public FormValidation doTestConnection(@QueryParameter("host") final String host,
 				@QueryParameter("port") final String port,
-				@QueryParameter("tokenCredentialId") final String tokenCredentialId) {
+				@QueryParameter("tokenCredentialId") final String tokenCredentialId,
+				@QueryParameter("isSecured") final boolean secured) {
+			Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
 			try (CloseableHttpClient client = HttpClients.createDefault()) {
-				String testingResolvedHost = Utils.resolveParameterFromGlobalConfiguration(host);
-				String testingResolvedPort = Utils.resolveParameterFromGlobalConfiguration(port);
+
+				String protocol = secured ? "https://" : "http://";
 
 				HttpGet httpGet = new HttpGet(
-						"http://" + testingResolvedHost + ":" + testingResolvedPort + "/api/Dcm/");
+						protocol + host + ":" + port + "/api/Dcm/");
 
 				StandardUsernamePasswordCredentials credentials = Utils
 						.lookupCredentials(tokenCredentialId);
@@ -201,20 +202,12 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 			return Messages.DevTestPlugin_DescriptorImpl_DisplayName();
 		}
 
-		public String getResolvedHost() {
-			return resolvedHost;
-		}
-
 		public String getHost() {
 			return host;
 		}
 
 		public void setHost(String host) {
 			this.host = host;
-		}
-
-		public String getResolvedPort() {
-			return resolvedPort;
 		}
 
 		public String getPort() {
@@ -249,6 +242,10 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 			this.tokenCredentialId = Util.fixEmpty(tokenCredentialId);
 		}
 
+		public boolean isSecured() {
+			return secured;
+		}
+
 		/**
 		 * Method used to fill dropdown with credential tokens.
 		 *
@@ -266,6 +263,5 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 							ACL.SYSTEM)
 					);
 		}
-
 	}
 }

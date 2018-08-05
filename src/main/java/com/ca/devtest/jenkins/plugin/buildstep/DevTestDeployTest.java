@@ -28,7 +28,6 @@ package com.ca.devtest.jenkins.plugin.buildstep;
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
 import com.ca.devtest.jenkins.plugin.postbuild.parser.TestInvokeApiResultParser;
-import com.ca.devtest.jenkins.plugin.postbuild.report.Report;
 import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
 import com.ca.devtest.jenkins.plugin.util.Utils;
 import com.google.gson.JsonElement;
@@ -100,11 +99,12 @@ public class DevTestDeployTest extends DefaultBuildStep {
 	 * @param testType          switch determining if executing test or testsuite (link between
 	 *                          frontend and backend) (possible values from UI "tests" or "suites"
 	 * @param tokenCredentialId credentials token id
+	 * @param secured           if https should be for custom registry
 	 */
 	@DataBoundConstructor
 	public DevTestDeployTest(boolean useCustomRegistry, String host, String port, String marFilePath,
-			String testType, String tokenCredentialId) {
-		super(useCustomRegistry, host, port, tokenCredentialId);
+			String testType, String tokenCredentialId, boolean secured) {
+		super(useCustomRegistry, host, port, tokenCredentialId, secured);
 		this.marFilePath = marFilePath;
 		this.testType = testType;
 		this.test = testType.equalsIgnoreCase("tests");
@@ -135,14 +135,21 @@ public class DevTestDeployTest extends DefaultBuildStep {
 		Utils.checkRegistryEndpoint(this);
 
 		String currentHost = isUseCustomRegistry() ? super.getHost()
-				: DevTestPluginConfiguration.get().getResolvedHost();
+				: DevTestPluginConfiguration.get().getHost();
 		currentHost = Utils.resolveParameter(currentHost, run, listener);
 
 		String currentPort = isUseCustomRegistry() ? super.getPort()
-				: DevTestPluginConfiguration.get().getResolvedPort();
+				: DevTestPluginConfiguration.get().getPort();
 		currentPort = Utils.resolveParameter(currentPort, run, listener);
 
-		String baseUrl = "http://" + currentHost + ":" + currentPort + "/";
+		String currentProtocol;
+		if (isUseCustomRegistry()) {
+			currentProtocol = isSecured() ? "https://" : "http://";
+		} else {
+			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
+		}
+
+		String baseUrl = currentProtocol + currentHost + ":" + currentPort + "/";
 		FilePath workDir = new FilePath(run.getRootDir());
 		String runItemId;
 		String runItemStatus;
@@ -210,12 +217,6 @@ public class DevTestDeployTest extends DefaultBuildStep {
 			} else {
 				run.setResult(Result.SUCCESS);
 			}
-
-			//Test/Suite run details: Z tests executed (Y tests passed, X tests failed)
-			Report report = new TestInvokeApiResultParser(listener.getLogger())
-					.parseStep(run.getRootDir().toString() + "/report/" + runItemId);
-			listener.getLogger().println(Messages.DevTestDeployTest_statusDetails(report.getTotalCount(),
-					report.getSuccessfullTests().size(),report.getFailCount()));
 
 		} finally {
 			if (client != null) {

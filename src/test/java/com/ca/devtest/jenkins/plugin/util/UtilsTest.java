@@ -61,22 +61,6 @@ public class UtilsTest {
 		assertTrue(paths.get(0).startsWith("fff1"));
 		assertTrue(paths.get(1).endsWith(".mar"));
 		assertTrue(paths.get(1).contains("/fff3"));
-
-		paths = Utils
-				.getFilesMatchingWildcard("**/*.mar", baseDir.toString());
-		assertEquals(paths.size(), 2);
-		assertTrue(paths.get(0).endsWith(".mar"));
-		assertTrue(paths.get(0).startsWith("fff1"));
-		assertTrue(paths.get(1).endsWith(".mar"));
-		assertTrue(paths.get(1).contains("/fff3"));
-
-		paths = Utils
-				.getFilesMatchingWildcard("\\**/*.mar", baseDir.toString());
-		assertEquals(paths.size(), 2);
-		assertTrue(paths.get(0).endsWith(".mar"));
-		assertTrue(paths.get(0).startsWith("fff1"));
-		assertTrue(paths.get(1).endsWith(".mar"));
-		assertTrue(paths.get(1).contains("/fff3"));
 	}
 
 	@Test
@@ -86,30 +70,12 @@ public class UtilsTest {
 		assertEquals(paths.size(), 1);
 		assertTrue(paths.get(0).endsWith(".mar"));
 		assertTrue(paths.get(0).startsWith("fff1"));
-
-		paths = Utils
-				.getFilesMatchingWildcard("\\*.mar", baseDir.toString());
-		assertEquals(paths.size(), 1);
-		assertTrue(paths.get(0).endsWith(".mar"));
-		assertTrue(paths.get(0).startsWith("fff1"));
-
-		paths = Utils
-				.getFilesMatchingWildcard("*.mar", baseDir.toString());
-		assertEquals(paths.size(), 1);
-		assertTrue(paths.get(0).endsWith(".mar"));
-		assertTrue(paths.get(0).startsWith("fff1"));
 	}
 
 	@Test
 	public void testGetFilesMatchingWildcard_SearchForPartialName() throws IOException {
 		List<String> paths = Utils
 				.getFilesMatchingWildcard("/fff1*.mar", baseDir.toString());
-		assertEquals(paths.size(), 1);
-		assertTrue(paths.get(0).endsWith(".mar"));
-		assertTrue(paths.get(0).startsWith("fff1"));
-
-		paths = Utils
-				.getFilesMatchingWildcard("/?ff1*.mar", baseDir.toString());
 		assertEquals(paths.size(), 1);
 		assertTrue(paths.get(0).endsWith(".mar"));
 		assertTrue(paths.get(0).startsWith("fff1"));
@@ -127,7 +93,7 @@ public class UtilsTest {
 	@Test(expected = AbortException.class)
 	public void testGetFilesMatchingWildcard_NothingMatches() throws IOException {
 		List<String> paths = Utils
-				.getFilesMatchingWildcard("*.test", baseDir.toString());
+				.getFilesMatchingWildcard("***", baseDir.toString());
 	}
 
 	@Test(expected = AbortException.class)

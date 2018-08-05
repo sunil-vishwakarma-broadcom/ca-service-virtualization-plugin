@@ -71,10 +71,6 @@ public class TestInvokeApiResultParser implements Parser {
 		return new Report(getSuites(rootDir), getStandAloneTests(rootDir));
 	}
 
-	public Report parseStep(String stepDir) {
-		return new Report(getSuiteForStep(stepDir), getStandAloneTestForStep(stepDir));
-	}
-
 	@Override
 	public List<String> getCasesIdsFromSuite(String suiteCasesJson) {
 		if (suiteCasesJson == null) {
@@ -258,22 +254,48 @@ public class TestInvokeApiResultParser implements Parser {
 		return parseSimpleCase(report, cycles);
 	}
 
+
 	List<TestSuite> getSuites(String rootDir) {
 		logger.println(Messages.DevTestParser_StartSuite());
 		List<String> stepDirs = getDirs(rootDir);
 		List<TestSuite> suites = new ArrayList<>();
 		for (String stepDir : stepDirs) {
-			suites.addAll(getSuiteForStep(stepDir));
+			List<String> suiteDirs = getDirs(stepDir + "/suites");
+			for (String suiteDir : suiteDirs) {
+				List<String> testDirs = getDirs(suiteDir + "/tests");
+				List<TestCase> testCases = new ArrayList<>();
+				for (String dirPath : testDirs) {
+					TestCase testCase = parseCaseForTest(dirPath);
+					if (testCase != null) {
+						testCases.add(testCase);
+					} else {
+						logger.println(Messages.DevTestParser_CaseNotParsedIn(dirPath));
+					}
+				}
+				String jsonString = readReport(suiteDir + "/suite.json");
+				JsonElement report = null;
+				try {
+					report = jparser.parse(jsonString);
+				} catch (Exception ex) {
+					logger.println(Messages.DevTestParser_SuiteNotParsed());
+				}
+				TestSuite suite = parseSuite(report, testCases);
+				if (suite != null) {
+					suites.add(suite);
+				} else {
+					logger.println(Messages.DevTestParser_SuiteNotParsedIn(suiteDir));
+				}
+			}
 		}
 		return suites;
 	}
 
-	private List<TestSuite> getSuiteForStep(String stepDir) {
-		List<String> suiteDirs = getDirs(stepDir + "/suites");
-		List<TestSuite> resSuites = new ArrayList<>();
-		for (String suiteDir : suiteDirs) {
-			List<String> testDirs = getDirs(suiteDir + "/tests");
-			List<TestCase> testCases = new ArrayList<>();
+	private List<TestCase> getStandAloneTests(String rootDir) {
+		logger.println(Messages.DevTestParser_StartCases());
+		List<String> stepDirs = getDirs(rootDir);
+		List<TestCase> testCases = new ArrayList<>();
+		for (String stepDir : stepDirs) {
+			List<String> testDirs = getDirs(stepDir + "/tests");
 			for (String dirPath : testDirs) {
 				TestCase testCase = parseCaseForTest(dirPath);
 				if (testCase != null) {
@@ -282,47 +304,10 @@ public class TestInvokeApiResultParser implements Parser {
 					logger.println(Messages.DevTestParser_CaseNotParsedIn(dirPath));
 				}
 			}
-			String jsonString = readReport(suiteDir + "/suite.json");
-			JsonElement report = null;
-			try {
-				report = jparser.parse(jsonString);
-			} catch (Exception ex) {
-				logger.println(Messages.DevTestParser_SuiteNotParsed());
-			}
-			TestSuite suite = parseSuite(report, testCases);
-			if (suite != null) {
-				resSuites.add(suite);
-			} else {
-				logger.println(Messages.DevTestParser_SuiteNotParsedIn(suiteDir));
-			}
-		}
-		return resSuites;
-	}
-
-
-	private List<TestCase> getStandAloneTests(String rootDir) {
-		logger.println(Messages.DevTestParser_StartCases());
-		List<String> stepDirs = getDirs(rootDir);
-		List<TestCase> testCases = new ArrayList<>();
-		for (String stepDir : stepDirs) {
-			testCases.addAll(getStandAloneTestForStep(stepDir));
 		}
 		return testCases;
 	}
 
-	private List<TestCase> getStandAloneTestForStep(String stepDir) {
-		List<TestCase> resTests = new ArrayList<>();
-		List<String> testDirs = getDirs(stepDir + "/tests");
-		for (String dirPath : testDirs) {
-			TestCase testCase = parseCaseForTest(dirPath);
-			if (testCase != null) {
-				resTests.add(testCase);
-			} else {
-				logger.println(Messages.DevTestParser_CaseNotParsedIn(dirPath));
-			}
-		}
-		return resTests;
-	}
 
 	private List<String> getDirs(String dir) {
 		List<String> dirs = new ArrayList<>();

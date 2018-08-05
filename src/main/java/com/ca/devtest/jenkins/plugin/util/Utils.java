@@ -150,8 +150,8 @@ public class Utils {
 	 * @return true if all fields are not null otherwise false
 	 */
 	private static boolean checkDefaultConfigurationNotNull() {
-		return ObjectUtils.allNotNull(DevTestPluginConfiguration.get().getResolvedHost(),
-				DevTestPluginConfiguration.get().getResolvedPort(),
+		return ObjectUtils.allNotNull(DevTestPluginConfiguration.get().getHost(),
+				DevTestPluginConfiguration.get().getPort(),
 				DevTestPluginConfiguration.get().getUsername(),
 				DevTestPluginConfiguration.get().getPassword());
 	}
@@ -162,8 +162,8 @@ public class Utils {
 	 * @return true if some field is a empty string otherwise false
 	 */
 	private static boolean checkDefaultConfigurationIsEmpty() {
-		return DevTestPluginConfiguration.get().getResolvedHost().isEmpty()
-				|| DevTestPluginConfiguration.get().getResolvedPort().isEmpty()
+		return DevTestPluginConfiguration.get().getHost().isEmpty()
+				|| DevTestPluginConfiguration.get().getPort().isEmpty()
 				|| DevTestPluginConfiguration.get().getUsername().isEmpty()
 				|| DevTestPluginConfiguration.get().getPassword().getPlainText().isEmpty();
 	}
@@ -224,35 +224,6 @@ public class Utils {
 			envVars = build.getEnvironment(listener);
 		}
 
-		final VariableResolver<String> resolver = new VariableResolver.ByMap<>(envVars);
-		return Util.replaceMacro(envVars.expand(parameter), resolver);
-	}
-
-	/**
-	 * Resolves single Jenkins parameter without build.
-	 * Pattern for parameters in Jenkins is either
-	 * $parameter or ${parameter}.
-	 *
-	 * @param parameter parameter
-	 *
-	 * @return String resolved parameters
-	 */
-	public static String resolveParameterFromGlobalConfiguration(String parameter) {
-		Jenkins jenkins = Jenkins.getInstance();
-		DescribableList<NodeProperty<?>, NodePropertyDescriptor> globalNodeProperties = jenkins
-				.getGlobalNodeProperties();
-		List<EnvironmentVariablesNodeProperty> envVarsNodePropertyList = globalNodeProperties
-				.getAll(hudson.slaves.EnvironmentVariablesNodeProperty.class);
-
-		EnvironmentVariablesNodeProperty newEnvVarsNodeProperty;
-		EnvVars envVars;
-		if (envVarsNodePropertyList == null || envVarsNodePropertyList.isEmpty()) {
-			newEnvVarsNodeProperty = new hudson.slaves.EnvironmentVariablesNodeProperty();
-			globalNodeProperties.add(newEnvVarsNodeProperty);
-			envVars = newEnvVarsNodeProperty.getEnvVars();
-		} else {
-			envVars = envVarsNodePropertyList.get(0).getEnvVars();
-		}
 		final VariableResolver<String> resolver = new VariableResolver.ByMap<>(envVars);
 		return Util.replaceMacro(envVars.expand(parameter), resolver);
 	}
@@ -320,14 +291,8 @@ public class Utils {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attribs) {
 				if (file != null) {
-					String matcher = startDir + wildcard;
-					if ((!wildcard.startsWith("\\") && !wildcard.startsWith("/"))
-							&&
-							(!startDir.endsWith("\\") && !startDir.endsWith("/"))) {
-						matcher = startDir + "/" + wildcard;
-					}
 					String path = file.toAbsolutePath().toString().replace('\\', '/');
-					if (pathMatcher.match((matcher).replace('\\', '/'), path)) {
+					if (pathMatcher.match((startDir + wildcard).replace('\\', '/'), path)) {
 						files.add(new File(startDir).toURI().relativize(new File(path).toURI()).getPath());
 					}
 				}

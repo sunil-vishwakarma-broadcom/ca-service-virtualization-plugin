@@ -155,6 +155,11 @@ public class DevTestStartVsTest extends AbstractDevTestBuildStepTest {
 	}
 
 	@Test
+	public void testBuildOverrideDefaultSettings() throws Exception {
+		//todo
+	}
+
+	@Test
 	public void testVseNameEmpty() throws Exception {
 		vs.useTransaction("startVsAndVseDoesntExist");
 
@@ -236,6 +241,6 @@ public class DevTestStartVsTest extends AbstractDevTestBuildStepTest {
 	private DevTestStartVs createPlugin(boolean useCustomRegistry, String host, String port,
 			String vseName, String vsName, String tokenId) {
 		return new DevTestStartVs(useCustomRegistry, host, port,
-				vseName, vsName, tokenId);
+				vseName, vsName, tokenId, false);
 	}
 }

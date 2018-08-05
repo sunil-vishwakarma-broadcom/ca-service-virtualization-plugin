@@ -154,6 +154,6 @@ public class DevTestDeployTestTest extends AbstractDevTestBuildStepTest {
 
 	private DevTestDeployTest createPlugin(boolean useCustomRegistry, String host, String port,
 			String marFilesPath, String testType, String tokenId) {
-		return new DevTestDeployTest(useCustomRegistry, host, port, marFilesPath, testType, tokenId);
+		return new DevTestDeployTest(useCustomRegistry, host, port, marFilesPath, testType, tokenId, false);
 	}
 }

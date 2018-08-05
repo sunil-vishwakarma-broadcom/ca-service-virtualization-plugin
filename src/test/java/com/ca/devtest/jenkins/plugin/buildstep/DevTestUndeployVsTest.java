@@ -57,8 +57,10 @@ public class DevTestUndeployVsTest extends AbstractDevTestBuildStepTest {
 		FreeStyleProject project = jenkins.createFreeStyleProject();
 		project.getBuildersList().add(createPlugin("VSE", "webservices-vs\n webservices-vs2"));
 		project = jenkins.configRoundtrip(project);
+
+		DevTestUndeployVs test = createPlugin("VSE", "webservices-vs\n webservices-vs2");
 		jenkins
-				.assertEqualDataBoundBeans(createPlugin("VSE", "webservices-vs\n webservices-vs2"),
+				.assertEqualDataBoundBeans(test,
 						project.getBuildersList().get(0));
 	}
 
@@ -250,6 +252,6 @@ public class DevTestUndeployVsTest extends AbstractDevTestBuildStepTest {
 	private DevTestUndeployVs createPlugin(boolean useCustomRegistry, String host, String port,
 			String vseName, String vsName, String tokenId) {
 		return new DevTestUndeployVs(useCustomRegistry, host, port, vseName, vsName,
-				tokenId);
+				tokenId, false);
 	}
 }

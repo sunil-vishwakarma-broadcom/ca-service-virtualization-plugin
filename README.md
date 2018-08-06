@@ -10,4 +10,4 @@ Follow the [CA Service Virtualization Jenkins plugin community](https://communit
 
 Copyright (c) 2018 CA Technologies.
 
-Licensed under the [Eclipse Public License - v 1.0](https://www.eclipse.org/org/documents/epl-v10.php)
+Licensed under the [Eclipse Public License - v 2.0](https://www.eclipse.org/legal/epl-2.0/)

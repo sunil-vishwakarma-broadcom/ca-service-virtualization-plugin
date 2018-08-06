@@ -151,7 +151,7 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 		public FormValidation doTestConnection(@QueryParameter("host") final String host,
 				@QueryParameter("port") final String port,
 				@QueryParameter("tokenCredentialId") final String tokenCredentialId,
-				@QueryParameter("isSecured") final boolean secured) {
+				@QueryParameter("secured") final boolean secured) {
 			Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
 
 			try (CloseableHttpClient client = HttpClients.createDefault()) {

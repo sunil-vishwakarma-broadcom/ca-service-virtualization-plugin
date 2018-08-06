@@ -28,6 +28,7 @@ package com.ca.devtest.jenkins.plugin.buildstep;
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
 import com.ca.devtest.jenkins.plugin.postbuild.parser.TestInvokeApiResultParser;
+import com.ca.devtest.jenkins.plugin.postbuild.report.Report;
 import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
 import com.ca.devtest.jenkins.plugin.util.Utils;
 import com.google.gson.JsonElement;
@@ -217,6 +218,12 @@ public class DevTestDeployTest extends DefaultBuildStep {
 			} else {
 				run.setResult(Result.SUCCESS);
 			}
+
+			//Test/Suite run details: Z tests executed (Y tests passed, X tests failed)
+			Report report = new TestInvokeApiResultParser(listener.getLogger())
+					.parseStep(run.getRootDir().toString() + "/report/" + runItemId);
+			listener.getLogger().println(Messages.DevTestDeployTest_statusDetails(report.getTotalCount(),
+					report.getSuccessfullTests().size(),report.getFailCount()));
 
 		} finally {
 			if (client != null) {

@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-  CA Service Virtualization Plugin
+  This plugin provides out of the box integration of <a href="https://www.ca.com/us/products/ca-service-virtualization.html" target="_blank">CA Service Virtualization</a> capabilities into continuous integration pipelines.
 </div>

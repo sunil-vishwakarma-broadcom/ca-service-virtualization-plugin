@@ -40,10 +40,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
-import hudson.slaves.EnvironmentVariablesNodeProperty;
-import hudson.slaves.NodeProperty;
-import hudson.slaves.NodePropertyDescriptor;
-import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
@@ -291,8 +287,27 @@ public class Utils {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attribs) {
 				if (file != null) {
+					String matcher = startDir + wildcard;
+					if ((!wildcard.startsWith("\\") && !wildcard.startsWith("/"))
+							&&
+							(!startDir.endsWith("\\") && !startDir.endsWith("/"))) {
+						matcher = startDir + "/" + wildcard;
+					}
+					matcher = (matcher).replace('\\', '/');
+					// sanitizing paths before matching (making matcher absolute)
+					// pattern and a path must both be absolute or must both be relative
+					// in order for the two to match in Linux
+					if (!matcher.startsWith("/")) {
+						if (matcher.length() >= 3) {
+							if (!matcher.substring(1).startsWith(":/")) {
+								matcher = "/" + matcher;
+							}
+						} else {
+							matcher = "/" + matcher;
+						}
+					}
 					String path = file.toAbsolutePath().toString().replace('\\', '/');
-					if (pathMatcher.match((startDir + wildcard).replace('\\', '/'), path)) {
+					if (pathMatcher.match(matcher, path)) {
 						files.add(new File(startDir).toURI().relativize(new File(path).toURI()).getPath());
 					}
 				}

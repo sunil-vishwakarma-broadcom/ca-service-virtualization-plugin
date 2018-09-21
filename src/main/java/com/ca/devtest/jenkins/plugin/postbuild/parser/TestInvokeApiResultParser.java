@@ -119,7 +119,7 @@ public class TestInvokeApiResultParser implements Parser {
 
 			TestCase testCase = new TestCase.TestCaseBuilder()
 					.withId(safelyGetStringValue(caseObject, "testRunUniqueId"))
-					.withName(safelyGetStringValue(caseObject, "testRunName"))
+					.withName(safelyGetStringValue(caseObject, "testcaseName"))
 					.withState(safelyGetStringValue(caseObject, "endedState"))
 					.withElapsedTime(safelyGetStringValue(caseObject, "elapsedTimeInMillSec"))
 					.withStart(safelyGetStringValue(caseObject, "startTime"))
@@ -159,7 +159,7 @@ public class TestInvokeApiResultParser implements Parser {
 		JsonObject caseObject = caseElement.getAsJsonObject();
 		TestCase testCase = new TestCase.TestCaseBuilder()
 				.withId(safelyGetStringValue(caseObject, "testRunUniqueId"))
-				.withName(safelyGetStringValue(caseObject, "testRunName"))
+				.withName(safelyGetStringValue(caseObject, "testcaseName"))
 				.withCycles(cycles)
 				.build();
 		return testCase;

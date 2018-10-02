@@ -136,7 +136,7 @@ public class TestInvokeApiResultParserTest {
 
 		TestCase testCase = casesList.get(0);
 		assertEquals(testCase.getTestCaseId(), "4414E9C0E5B211E7BADA020027E349EE");
-		assertEquals(testCase.getName(), "Run1User10Cycle");
+		assertEquals(testCase.getName(), "test-data-driven-http-rest");
 	}
 
 	@Test
@@ -190,7 +190,7 @@ public class TestInvokeApiResultParserTest {
 				new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss-SSSS").parse("2017-12-20T13:02:25-0500"));
 		assertEquals(testCase.getState(), TestState.FAILED);
 
-		assertEquals(testCase.getName(), "Run1User1Cycle");
+		assertEquals(testCase.getName(), "test-data-driven-http-rest");
 		assertEquals(0, testCase.getCycles().size());
 	}
 

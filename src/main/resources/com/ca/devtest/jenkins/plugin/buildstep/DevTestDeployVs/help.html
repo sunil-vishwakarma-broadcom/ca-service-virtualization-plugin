@@ -1,3 +1,9 @@
 <div>
-  Deploys and starts virtual service provided as .mar file on specified VSE. Mar file needs to provided in the project workspace or as URL location or absolute filesystem location. Multiple .mar files could be provided to deploy and start more virtual services at once.
+  <p>
+    Deploys and starts virtual service provided as a .mar file to target VSE. More services could be provided using comma or newline separator.
+  </p>
+  <p>
+    Throws exception if .mar file is incorrect, virtual service is already deployed, authorization
+    to CA DevTest fails or connection to CA DevTest cannot be established.
+  </p>
 </div>

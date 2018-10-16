@@ -180,7 +180,7 @@ public class DevTestDeployTest extends DefaultBuildStep {
 		CloseableHttpClient client = null;
 
 		try {
-			HttpHost host = new HttpHost(currentHost, Integer.valueOf(currentPort));
+			HttpHost host = new HttpHost(currentHost, Integer.parseInt(currentPort));
 			client = createHttpClient(host);
 
 			HttpEntity entity = createPostEntity(workspace, listener, resolvedMarFilePath);

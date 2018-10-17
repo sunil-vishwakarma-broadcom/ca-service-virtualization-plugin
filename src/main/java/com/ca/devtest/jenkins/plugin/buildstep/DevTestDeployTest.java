@@ -52,15 +52,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -169,7 +180,8 @@ public class DevTestDeployTest extends DefaultBuildStep {
 		CloseableHttpClient client = null;
 
 		try {
-			client = createHttpClient(currentHost, currentPort);
+			HttpHost host = new HttpHost(currentHost, Integer.parseInt(currentPort));
+			client = createHttpClient(host);
 
 			HttpEntity entity = createPostEntity(workspace, listener, resolvedMarFilePath);
 			String itemUrl = baseUrl + (isTest() ? RUN_TEST_URL : RUN_SUITE_URL);
@@ -232,7 +244,7 @@ public class DevTestDeployTest extends DefaultBuildStep {
 		}
 	}
 
-	private CloseableHttpClient createHttpClient(String host, String port) {
+	private CloseableHttpClient createHttpClient(HttpHost host) {
 
 		String currentUsername = isUseCustomRegistry() ? super.getUsername()
 				: DevTestPluginConfiguration.get().getUsername();
@@ -241,10 +253,11 @@ public class DevTestDeployTest extends DefaultBuildStep {
 
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
 		credsProvider.setCredentials(
-				new AuthScope(host, Integer.parseInt(port)),
+				new AuthScope(host),
 				new UsernamePasswordCredentials(currentUsername, currentPassword));
 
 		return HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+
 	}
 
 	/**
@@ -273,9 +286,19 @@ public class DevTestDeployTest extends DefaultBuildStep {
 			String marFilePath) throws IOException, InterruptedException {
 		FilePath marFile = workspace.child(marFilePath);
 		File file = marFile.act(new MyFileCallable());
+//		String tmp = marFile.readToString();
 		if (file != null) {
+			//if remote, make tmp copy to be able to send file to devtest
+			ContentBody cbody = null;
+			if (marFile.isRemote()) {
+				//we need to read remote file in advance to be available for httpclient
+				byte[] data = IOUtils.toByteArray(marFile.read());
+				cbody = new ByteArrayBody(data, marFilePath);
+			} else {
+				cbody = new FileBody(file);
+			}
 			return MultipartEntityBuilder.create()
-																	 .addPart("file", new FileBody(file))
+																	 .addPart("file", cbody)
 																	 .build();
 		} else {
 			listener.getLogger()

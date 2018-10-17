@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -52,6 +53,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -208,8 +211,16 @@ public class DevTestDeployVs extends DefaultBuildStep {
 			FilePath marFile = workspace.child(marFilePath);
 			File file = marFile.act(new MyFileCallable());
 			if (file != null) {
+				ContentBody cbody = null;
+				if (marFile.isRemote()) {
+					//we need to read remote file in advance to be available for httpclient
+					byte[] data = IOUtils.toByteArray(marFile.read());
+					cbody = new ByteArrayBody(data, marFilePath);
+				} else {
+					cbody = new FileBody(file);
+				}
 				return MultipartEntityBuilder.create()
-																		 .addPart("file", new FileBody(file))
+																		 .addPart("file", cbody)
 																		 .build();
 			} else {
 				listener.getLogger()

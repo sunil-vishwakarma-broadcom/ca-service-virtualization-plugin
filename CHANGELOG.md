@@ -1,3 +1,10 @@
+#### v1.0.2 (October 28th, 2018)
+
+- `FIXED` ([JENKINS-53782](https://issues.jenkins-ci.org/browse/JENKINS-53782)): Fixed issue with wrong test or test suite name displayed in the CA Service Virtualization report.
+- `FIXED` ([JENKINS-53783](https://issues.jenkins-ci.org/browse/JENKINS-53783)): Comma and new line separated values are trimmed properly.
+- `FIXED` ([JENKINS-53784](https://issues.jenkins-ci.org/browse/JENKINS-53784)): .mar files are properly located in workspaces in case of master-slave setup.
+- `IMPROVEMENT`: Pipeline documentation covers all command parameters.
+
 #### v1.0.1 (August 7th, 2018)
 
 - `FIXED`: Corrected plugin description in Jenkins Plugin Management UI.

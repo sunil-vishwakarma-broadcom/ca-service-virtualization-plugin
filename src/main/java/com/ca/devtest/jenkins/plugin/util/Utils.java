@@ -36,6 +36,7 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Util;
+import hudson.model.Item;
 import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -63,6 +64,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.AntPathMatcher;
+import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Utils class providing helping methods.
@@ -71,6 +73,7 @@ import org.springframework.util.AntPathMatcher;
  */
 public class Utils {
 
+	private Utils(){}
 	/**
 	 * Creates authorization header for basic security.
 	 *
@@ -98,10 +101,10 @@ public class Utils {
 	 *
 	 * @return form validation
 	 */
-	public static FormValidation doCheckHost(boolean useCustomRegistry, String host, String port,
+	public static FormValidation doCheckHost(@AncestorInPath Item context, boolean useCustomRegistry, String host, String port,
 			String tokenCredentialId) {
 		StandardUsernamePasswordCredentials jenkinsCredentials = Utils
-				.lookupCredentials(tokenCredentialId);
+				.lookupCredentials(context, tokenCredentialId);
 		String username = "";
 		String password = "";
 		if (jenkinsCredentials != null) {
@@ -231,13 +234,22 @@ public class Utils {
 	 *
 	 * @return credentials object else if credentialId is null then it return null
 	 */
-	public static StandardUsernamePasswordCredentials lookupCredentials(String credentialId) {
+	public static StandardUsernamePasswordCredentials lookupCredentials(@AncestorInPath Item context,
+																		String credentialId) {
 		if (credentialId == null) {
 			return null;
 		}
-		List<StandardUsernamePasswordCredentials> credentials = CredentialsProvider
-				.lookupCredentials(StandardUsernamePasswordCredentials.class, Jenkins.getInstance(),
-						ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
+		List<StandardUsernamePasswordCredentials> credentials;
+		if(context == null) {
+			credentials = CredentialsProvider
+					.lookupCredentials(StandardUsernamePasswordCredentials.class, Jenkins.getInstance(),
+							ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
+		}else{
+			credentials = CredentialsProvider
+					.lookupCredentials(StandardUsernamePasswordCredentials.class, context,
+							ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
+			CredentialsMatcher matcher = CredentialsMatchers.withId(credentialId);
+		}
 		CredentialsMatcher matcher = CredentialsMatchers.withId(credentialId);
 		return CredentialsMatchers.firstOrNull(credentials, matcher);
 	}

@@ -38,6 +38,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Item;
 import hudson.model.AbstractProject;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -79,6 +80,7 @@ import org.apache.http.util.EntityUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Build step for starting test/testsuite.
@@ -145,6 +147,7 @@ public class DevTestDeployTest extends DefaultBuildStep {
 			throws InterruptedException, IOException {
 
 		Utils.checkRegistryEndpoint(this);
+		this.updateCredentails(run);
 
 		String currentHost = isUseCustomRegistry() ? super.getHost()
 				: DevTestPluginConfiguration.get().getHost();
@@ -276,7 +279,9 @@ public class DevTestDeployTest extends DefaultBuildStep {
 				body = EntityUtils.toString(resp.getEntity());
 				state = parseResponseForStatus(body);
 			} finally {
-				resp.close();
+				if(resp!=null) {
+					resp.close();
+				}
 			}
 		} while (!this.endStates.contains(state));
 		return state;
@@ -338,10 +343,10 @@ public class DevTestDeployTest extends DefaultBuildStep {
 		 *
 		 * @return form validation
 		 */
-		public FormValidation doCheckHost(@QueryParameter boolean useCustomRegistry,
+		public FormValidation doCheckHost(@AncestorInPath Item context, @QueryParameter boolean useCustomRegistry,
 				@QueryParameter String host, @QueryParameter String port,
 				@QueryParameter String tokenCredentialId) {
-			return Utils.doCheckHost(useCustomRegistry, host, port, tokenCredentialId);
+			return Utils.doCheckHost(context, useCustomRegistry, host, port, tokenCredentialId);
 		}
 
 		/**

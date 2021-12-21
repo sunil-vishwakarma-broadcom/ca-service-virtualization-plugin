@@ -34,6 +34,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Item;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -52,6 +53,7 @@ import org.apache.http.util.EntityUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Build step for stopping virtual service.
@@ -107,6 +109,8 @@ public class DevTestStopVs extends DefaultBuildStep {
 			@Nonnull Launcher launcher, @Nonnull TaskListener listener)
 			throws InterruptedException, IOException {
 		Utils.checkRegistryEndpoint(this);
+		this.updateCredentails(run);
+
 		String currentHost = isUseCustomRegistry() ? super.getHost()
 				: DevTestPluginConfiguration.get().getHost();
 		currentHost = Utils.resolveParameter(currentHost, run, listener);
@@ -218,10 +222,10 @@ public class DevTestStopVs extends DefaultBuildStep {
 		 *
 		 * @return form validation
 		 */
-		public FormValidation doCheckHost(@QueryParameter boolean useCustomRegistry,
+		public FormValidation doCheckHost(@AncestorInPath Item context, @QueryParameter boolean useCustomRegistry,
 				@QueryParameter String host, @QueryParameter String port,
 				@QueryParameter String tokenCredentialId) {
-			return Utils.doCheckHost(useCustomRegistry, host, port, tokenCredentialId);
+			return Utils.doCheckHost(context, useCustomRegistry, host, port, tokenCredentialId);
 		}
 
 		@Override

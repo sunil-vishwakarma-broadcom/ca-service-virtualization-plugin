@@ -31,10 +31,15 @@ import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
 import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
 import com.ca.devtest.jenkins.plugin.util.Utils;
+import com.ca.devtest.jenkins.plugin.data.DeployMarData;
+import com.ca.devtest.jenkins.plugin.data.DevTestReturnValue;
+import com.ca.devtest.jenkins.plugin.slavecallable.DevTestDeployVsCallable;
+
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Item;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -45,8 +50,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
+import java.io.*;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -63,6 +70,7 @@ import org.apache.http.util.EntityUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Build step for deploying virtual service.
@@ -73,7 +81,7 @@ public class DevTestDeployVs extends DefaultBuildStep {
 
 	private List<String> marFilesPaths;
 	private String vseName;
-	private String urlPath;
+	//private String urlPath;
 	private String separator;
 
 	/**
@@ -100,7 +108,7 @@ public class DevTestDeployVs extends DefaultBuildStep {
 				this.separator = "\n";
 			}
 		} else {
-			this.marFilesPaths = new ArrayList<String>();
+			this.marFilesPaths = new ArrayList<>();
 		}
 		this.vseName = vseName;
 	}
@@ -117,6 +125,7 @@ public class DevTestDeployVs extends DefaultBuildStep {
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
 		Utils.checkRegistryEndpoint(this);
+		this.updateCredentails(run);
 
 		if (vseName == null || vseName.isEmpty()) {
 			throw new AbortException("VSE name cannot be empty!");
@@ -148,43 +157,19 @@ public class DevTestDeployVs extends DefaultBuildStep {
 				: DevTestPluginConfiguration.get().getPassword().getPlainText();
 
 		String resolvedVseName = Utils.resolveParameter(vseName, run, listener);
-		this.urlPath = "/api/Dcm/VSEs/" + resolvedVseName + "/actions/deployMar/";
+		String urlPath = "/api/Dcm/VSEs/" + resolvedVseName + "/actions/deployMar/";
 
 		List<String> resolvedMarFilesPaths = Utils.getFilesMatchingWildcardList(
 				Utils.resolveParameters(marFilesPaths, run, listener), workspace.absolutize().toString());
 
-		for (String marFilePath : resolvedMarFilesPaths) {
-			listener.getLogger().println(Messages.DevTestDeployVs_deploying(marFilePath));
-			listener.getLogger()
-							.println(Messages.DevTestPlugin_devTestLocation(currentHost, currentPort));
-
-			HttpEntity entity = createPostEntity(workspace, listener, marFilePath);
-			HttpPost httpPost = new HttpPost(currentProtocol + currentHost + ":" + currentPort + urlPath);
-			httpPost.addHeader("Authorization", createBasicAuthHeader(currentUsername, currentPassword));
-			httpPost.addHeader("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
-			httpPost.setEntity(entity);
-
-			try (CloseableHttpClient client = HttpClients.createDefault();
-					CloseableHttpResponse response = client.execute(httpPost)) {
-
-				int statusCode = response.getStatusLine().getStatusCode();
-				String responseBody = EntityUtils.toString(response.getEntity());
-
-				if (statusCode == 201) {
-					listener.getLogger().println(Messages.DevTestPlugin_responseBody(responseBody));
-					listener.getLogger().println(Messages.DevTestDeployVs_success(marFilePath));
-				} else {
-					listener.getLogger().println(Messages.DevTestDeployVs_error());
-					String message;
-					if (statusCode == 200) {
-						message = Messages.DevTestPlugin_invalidCredentials();
-					} else {
-						message = Messages.DevTestPlugin_responseStatus(statusCode, responseBody);
-					}
-
-					throw new AbortException(message);
-				}
-			}
+		DeployMarData deployMarData = new DeployMarData(currentHost, currentPort, currentProtocol,
+				currentUsername, currentPassword, resolvedVseName, resolvedMarFilesPaths, urlPath);
+		DevTestReturnValue devTestReturnValue = launcher.getChannel().call(new DevTestDeployVsCallable(workspace, listener, deployMarData));
+		listener.getLogger().println("Job executed on node - "+devTestReturnValue.getNode());
+		if(devTestReturnValue.isSuccess()){
+			listener.getLogger().println(devTestReturnValue.getMessage());
+		}else{
+			throw new AbortException(devTestReturnValue.getMessage());
 		}
 	}
 
@@ -278,10 +263,10 @@ public class DevTestDeployVs extends DefaultBuildStep {
 		 *
 		 * @return form validation
 		 */
-		public FormValidation doCheckHost(@QueryParameter boolean useCustomRegistry,
+		public FormValidation doCheckHost(@AncestorInPath Item context, @QueryParameter boolean useCustomRegistry,
 				@QueryParameter String host, @QueryParameter String port,
 				@QueryParameter String tokenCredentialId) {
-			return Utils.doCheckHost(useCustomRegistry, host, port, tokenCredentialId);
+			return Utils.doCheckHost(context, useCustomRegistry, host, port, tokenCredentialId);
 		}
 
 		@Override

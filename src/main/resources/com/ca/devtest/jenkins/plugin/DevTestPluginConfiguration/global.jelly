@@ -8,7 +8,7 @@
     <f:entry field="port" title="${%Port}">
       <f:textbox default="1505"/>
     </f:entry>
-    <f:entry title="${%CredentialId}" field="tokenCredentialId">
+    <f:entry title="${%Credentials}" field="tokenCredentialId">
       <c:select/>
     </f:entry>
     <f:entry title="${%Secured}" field="secured" name="secured">

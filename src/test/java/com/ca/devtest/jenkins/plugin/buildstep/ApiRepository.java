@@ -35,6 +35,7 @@ import static com.ca.codesv.protocols.http.fluent.HttpFluentInterface.okMessage;
 import static com.ca.codesv.protocols.http.fluent.HttpFluentInterface.serverErrorMessage;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.CombinableMatcher.both;
+import static org.hamcrest.core.CombinableMatcher.either;
 
 import com.ca.codesv.sdk.annotation.TransactionDefinition;
 import com.ca.codesv.sdk.annotation.VirtualServiceRepository;
@@ -695,4 +696,77 @@ public class ApiRepository {
 	}
 
 
+	/**
+	 *Transaction Definition created for DevTestCreateAndDeployVsTest class - START
+	 *
+	 * @author sv673714
+	 */
+	//Create And Deploy VS virtualization
+	@TransactionDefinition(name = "createdeployVsif")
+	public void createdAndDeployedSuccessfulVsFromInputFile() {
+		forPost("http://" + host + "/lisa-virtualize-invoke/api/v3/vses/VSE/services")
+				.matchesBasicAuthorization("admin", "admin")
+				.matchesHeader("Accept", "application/json")
+				.matchesBody(contains("inputFile1"))
+				.doReturn(
+						aMessage(200)
+								.withJsonBody("{\"_links\":{\"self\":"
+										+"{\"href\":\""+host+"/lisa-virtualize-invoke/api/v2/vses/vse-id/services/vs-id\"}},"
+										+"\"serviceId\":\"vs-id\",\"serviceName\":\"API_Test_1\",\"modelName\":\"test-create-vs\","
+										+"\"capacity\":1,\"txnPerSecond\":0,\"txnCount\":0,\"peakTxnPerSecond\":0,"
+										+"\"thinkScale\":100,\"errorCount\":0,\"autoRestartEnabled\":true,\"status\":2,"
+										+"\"statusDescription\":\"running\",\"startTime\":\"3/18/21 8:46:35 PM\","
+										+"\"startTimeLong\":1616080595673,\"endTime\":\"\",\"endTimeLong\":0,\"upTime\":123,"
+										+"\"executionMode\":\"Most Efficient\",\"executionModeValue\":\"EFFICIENT\","
+										+"\"configurationName\":\"project.config\",\"resourceName\":\"8002 : http :  : /\",\"groupTag\":\"\"}")
+				);
+	}
+
+	/*
+	Create And Deploy VS virtualization
+	 */
+	@TransactionDefinition(name = "createdeployVs")
+	public void createdAndDeployedVsSuccessfulUploadVs() {
+		forPost("http://" + host + "/lisa-virtualize-invoke/api/v3/vses/VSE/services")
+				.matchesBasicAuthorization("admin", "admin")
+				.matchesHeader("Accept", "application/json")
+				.matchesBody(contains("inputFile1"))
+				.doReturn(
+						aMessage(200)
+								.withJsonBody("{\"_links\":{\"self\":"
+										+"{\"href\":\""+host+"/lisa-virtualize-invoke/api/v2/vses/vse-id/services/vs-id\"}},"
+										+"\"serviceId\":\"vs-id\",\"serviceName\":\"API_Test_1\",\"modelName\":\"test-create-vs\","
+										+"\"capacity\":1,\"txnPerSecond\":0,\"txnCount\":0,\"peakTxnPerSecond\":0,"
+										+"\"thinkScale\":100,\"errorCount\":0,\"autoRestartEnabled\":true,\"status\":2,"
+										+"\"statusDescription\":\"running\",\"startTime\":\"3/18/21 8:46:35 PM\","
+										+"\"startTimeLong\":1616080595673,\"endTime\":\"\",\"endTimeLong\":0,\"upTime\":123,"
+										+"\"executionMode\":\"Most Efficient\",\"executionModeValue\":\"EFFICIENT\","
+										+"\"configurationName\":\"project.config\",\"resourceName\":\"8002 : http :  : /\",\"groupTag\":\"\"}")
+				);
+	}
+
+	/*
+	Create And Deploy VS virtualization
+	 */
+	@TransactionDefinition(name = "createdeployVsURI")
+	public void createdAndDeployedVsSuccessWithURI() {
+		forPost("http://" + host + "/lisa-virtualize-invoke/api/v3/vses/VSE/services")
+				.matchesBasicAuthorization("admin", "admin")
+				.matchesHeader("Accept", "application/json")
+				.matchesBody( either(contains("swaggerurl")).or(contains("ramlurl")).or(contains("wadlurl")))
+				.doReturn(
+						aMessage(200)
+								.withJsonBody("{\"_links\":{\"self\":"
+										+"{\"href\":\""+host+"/lisa-virtualize-invoke/api/v2/vses/vse-id/services/vs-id\"}},"
+										+"\"serviceId\":\"vs-id\",\"serviceName\":\"API_Test_1\",\"modelName\":\"test-create-vs\","
+										+"\"capacity\":1,\"txnPerSecond\":0,\"txnCount\":0,\"peakTxnPerSecond\":0,"
+										+"\"thinkScale\":100,\"errorCount\":0,\"autoRestartEnabled\":true,\"status\":2,"
+										+"\"statusDescription\":\"running\",\"startTime\":\"3/18/21 8:46:35 PM\","
+										+"\"startTimeLong\":1616080595673,\"endTime\":\"\",\"endTimeLong\":0,\"upTime\":123,"
+										+"\"executionMode\":\"Most Efficient\",\"executionModeValue\":\"EFFICIENT\","
+										+"\"configurationName\":\"project.config\",\"resourceName\":\"8002 : http :  : /\",\"groupTag\":\"\"}")
+				);
+	}
+
+	//Transaction Definition created for DevTestCreateAndDeployVsTest - END
 }

@@ -33,6 +33,7 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import hudson.Extension;
 import hudson.Util;
+import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
@@ -52,6 +53,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
+import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Main point for DevTest plugin in jenkins used by all build and post-build steps. This class
@@ -124,7 +126,7 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 					.valueOf(formData.getJSONObject("DevTestPluginConfiguration").getString("secured"));
 
 			StandardUsernamePasswordCredentials credentials = Utils
-					.lookupCredentials(this.tokenCredentialId);
+					.lookupCredentials(null, this.tokenCredentialId);
 			if (credentials != null) {
 				this.username = credentials.getUsername();
 				this.password = credentials.getPassword();
@@ -162,7 +164,7 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 						protocol + host + ":" + port + "/api/Dcm/");
 
 				StandardUsernamePasswordCredentials credentials = Utils
-						.lookupCredentials(tokenCredentialId);
+						.lookupCredentials(null, tokenCredentialId);
 
 				if (credentials == null) {
 					return FormValidation.error(Messages.DevTestPlugin_DescriptorImpl_requiredCred());

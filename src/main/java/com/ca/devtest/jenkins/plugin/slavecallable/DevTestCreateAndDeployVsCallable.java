@@ -78,20 +78,7 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
         this.data = data;
     }
 
-    @Override
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public DevTestReturnValue call() throws RuntimeException{
-        DevTestReturnValue devTestReturnValue = new DevTestReturnValue();
-        try{
-            String nodeName = InetAddress.getLocalHost().getHostName();
-            getListener().getLogger().println("\n> Executing task on node "+ nodeName);
-            devTestReturnValue.setNode(nodeName);
-            //undeploy here
-            if (Boolean.valueOf(data.isUndeploy())) {
-=======
-=======
->>>>>>> ee1b9e1c4a91ff566f99ee8ed9391dcb4ce8759f
+
     public DevTestReturnValue call() throws RuntimeException {
         DevTestReturnValue devTestReturnValue = new DevTestReturnValue();
         try {
@@ -100,10 +87,6 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
             devTestReturnValue.setNode(InetAddress.getLocalHost().getHostName());
             //undeploy here
             if(Boolean.valueOf(data.isUndeploy())) {
-<<<<<<< HEAD
->>>>>>> ee1b9e1 (Added support for Create and Deploy VS step)
-=======
->>>>>>> ee1b9e1c4a91ff566f99ee8ed9391dcb4ce8759f
                 handleUndeploy();
             }
             if(data.isDeploy()) getListener().getLogger().print(Messages.DevTestCreateAndDeployVs_creatingAndDeploying());

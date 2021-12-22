@@ -41,13 +41,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import hudson.remoting.VirtualChannel;
-=======
->>>>>>> ee1b9e1 (Added support for Create and Deploy VS step)
-=======
->>>>>>> ee1b9e1c4a91ff566f99ee8ed9391dcb4ce8759f
 import hudson.util.FormValidation;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;

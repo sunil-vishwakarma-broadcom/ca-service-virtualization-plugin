@@ -173,7 +173,7 @@ public class DevTestCreateAndDeployVsTest extends AbstractDevTestBuildStepTest {
         project.getBuildersList().add(builder);
 
         FreeStyleBuild build = jenkins.assertBuildStatus(Result.FAILURE, project.scheduleBuild2(0));
-        jenkins.assertLogContains("ERROR: Output stream is null", build);
+        jenkins.assertLogContains("ERROR: /C:/test-create-vsqqqqq.vsi (No such file or directory)", build);
     }
 
     @Test

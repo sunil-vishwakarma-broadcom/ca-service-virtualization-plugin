@@ -56,7 +56,7 @@ public class DevTestPluginTest extends AbstractDevTestBuildStepTest {
 		assertEquals(plugin.getHost(), "10.0.0.1");
 		assertEquals(plugin.getPort(), "1111");
 		StandardUsernamePasswordCredentials jenkinsCredentials = Utils
-				.lookupCredentials("token");
+				.lookupCredentials(null, "token");
 		assertEquals(jenkinsCredentials.getUsername(), "user");
 		assertEquals(jenkinsCredentials.getPassword(), Secret.fromString("password"));
 	}
@@ -71,7 +71,7 @@ public class DevTestPluginTest extends AbstractDevTestBuildStepTest {
 		assertEquals(plugin.getPort(), "1505");
 
 		StandardUsernamePasswordCredentials jenkinsCredentials = Utils
-				.lookupCredentials("token");
+				.lookupCredentials(null, "token");
 		assertEquals(jenkinsCredentials.getUsername(), "user");
 		assertEquals(jenkinsCredentials.getPassword(), Secret.fromString("password"));
 	}

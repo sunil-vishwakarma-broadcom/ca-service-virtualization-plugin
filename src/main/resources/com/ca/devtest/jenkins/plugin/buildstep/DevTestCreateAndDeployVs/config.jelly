@@ -1,0 +1,65 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:f="/lib/form" xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:c="/lib/credentials">
+  <!--Check tags here: http://reports.jenkins.io/reports/core-taglib/jelly-taglib-ref.html-->
+  <f:block>
+    <f:entry field="vseName" title="${%VseName}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="config" title="${%Config}">
+      <f:textarea default="{ &quot;virtualService&quot;: { &quot;version&quot;: &quot;2&quot;, &quot;name&quot;: &quot;API_Test_1&quot;, &quot;description&quot;: &quot;Invoke API V2&quot;, &quot;status&quot;: &quot;&quot; }, &quot;transportProtocol&quot;: { &quot;typeId&quot;: &quot;HTTP&quot;, &quot;basePath&quot;: &quot;/&quot;, &quot;useGateway&quot;: true, &quot;duptxns&quot;: true, &quot;hostHeaderPassThrough&quot;: false }, &quot;dataProtocol&quot;: { &quot;forRequest&quot;: true, &quot;typeId&quot;: &quot;RESTDPH&quot; } }"/>
+    </f:entry>
+    <f:entry field="deploy" title="${%Deploy}">
+      <select name="deploy" >
+        <option value="true">true</option>
+        <option value="false">false</option>
+      </select>
+    </f:entry>
+    <f:entry title="${%Undeploy}" field="undeploy" name="undeploy">
+      <f:checkbox default="false">
+      </f:checkbox>
+    </f:entry>
+    <f:entry field="inputFile1" title="${%InputFile1}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="inputFile2" title="${%InputFile2}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="activeConfig" title="${%ActiveConfig}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="dataFiles" title="${%DataFiles}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="swaggerurl" title="${%Swaggerurl}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="ramlurl" title="${%Ramlurl}">
+      <f:textbox/>
+    </f:entry>
+    <f:entry field="wadlurl" title="${%Wadlurl}">
+      <f:textbox/>
+    </f:entry>
+  </f:block>
+
+  <f:block>
+    <table>
+      <f:optionalBlock checked="${instance.useCustomRegistry}" field="useCustomRegistry"
+        inline="true"
+        name="useCustomRegistry" title="${%CustomRegistry}">
+        <f:entry field="host" title="${%RegistryHost}">
+          <f:textbox/>
+        </f:entry>
+        <f:entry field="port" title="${%Port}">
+          <f:textbox default="1505"/>
+        </f:entry>
+        <f:entry title="${%CredentialId}" field="tokenCredentialId" name="tokenCredentialId">
+           <c:select/>
+        </f:entry>
+        <f:entry title="${%Secured}" field="secured" name="secured">
+          <f:checkbox default="false">
+          </f:checkbox>
+        </f:entry>
+      </f:optionalBlock>
+    </table>
+  </f:block>
+</j:jelly>

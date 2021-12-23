@@ -9,7 +9,7 @@
   </parent>
   <groupId>io.jenkins.plugins</groupId>
   <artifactId>ca-service-virtualization</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.4</version>
   <packaging>hpi</packaging>
   <properties>
     <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
@@ -225,12 +225,8 @@
 
   <repositories>
     <repository>
-      <id>CA internal</id>
-      <url>http://isl-dsdc.ca.com/artifactory/maven-release-local</url>
-    </repository>
-    <repository>
-      <id>CA Bintray</id>
-      <url>https://ca.bintray.com/sv/</url>
+      <id>Broadcom Packages</id>
+      <url>https://packages.broadcom.com/artifactory/sv</url>
     </repository>
     <repository>
       <id>repo.jenkins-ci.org</id>

@@ -33,6 +33,8 @@ import hudson.model.Label;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.EnvironmentVariablesNodeProperty.Entry;
+
+import java.net.InetAddress;
 import java.util.Collections;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -212,9 +214,10 @@ public class DevTestDeployVsTest extends AbstractDevTestBuildStepTest {
 
 		FreeStyleBuild build = jenkins.assertBuildStatus(Result.FAILURE, project.scheduleBuild2(0));
 		jenkins
-				.assertLogContains("File webservices-vs.mar is no present in the workspace of job", build);
+				.assertLogContains("File webservices-vs.mar is no present in the workspace of job on machine "
+						+ InetAddress.getLocalHost().getHostName(), build);
 		jenkins.assertLogContains(
-				"FATAL: Cannot located file with relative path webservices-vs.mar in workspace of job",
+				"ERROR: Cannot located file with relative path webservices-vs.mar in workspace of job",
 				build);
 	}
 

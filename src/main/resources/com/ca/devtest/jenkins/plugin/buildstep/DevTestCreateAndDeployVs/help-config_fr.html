@@ -1,0 +1,24 @@
+<div>
+  JSON de configuration
+  </br>
+  <p>Exemple d'utilisation d'un objet de configuration incluant des informations sur le port et SSL</p>
+  <p style="color:#fff;background:#41444e;">{
+  "virtualService": {
+    "version": "2",
+    "name": "API_Test_1",
+    "description": "Invoke API V2",
+    "status": ""
+  },
+  "transportProtocol": {
+    "typeId": "HTTP",
+    "basePath": "/",
+    "useGateway": true,
+    "duptxns": true,
+    "hostHeaderPassThrough": false
+  },
+  "dataProtocol": {
+    "forRequest": true,
+    "typeId": "RESTDPH"
+  }
+}</p>
+</div>

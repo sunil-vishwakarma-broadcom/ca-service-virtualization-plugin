@@ -26,9 +26,14 @@
 
 package com.ca.devtest.jenkins.plugin.buildstep;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+
 import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -38,6 +43,9 @@ import jenkins.model.Jenkins;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 
+import java.util.List;
+import java.util.Collections;
+
 /**
  * Abstract descriptor, parent for buildstep descriptors.
  *
@@ -45,28 +53,32 @@ import org.kohsuke.stapler.QueryParameter;
  */
 public abstract class DefaultDescriptor extends BuildStepDescriptor<Builder> {
 
-	/**
-	 * Method used to fill dropdown with credential tokens.
-	 *
-	 * @param project       project
-	 * @param credentialsId credentials Id
-	 *
-	 * @return listbox model
-	 */
-	public ListBoxModel doFillTokenCredentialIdItems(@AncestorInPath Item project,
-			@QueryParameter String credentialsId) {
-		if (project == null && !Jenkins.getActiveInstance().hasPermission(Jenkins.ADMINISTER)
-				|| project != null && !project.hasPermission(Item.EXTENDED_READ)) {
-			return new StandardListBoxModel().includeCurrentValue(credentialsId);
-		}
+    /**
+     * Method used to fill dropdown with credential tokens.
+     *
+     * @param context       context
+     * @param remote remote
+     *
+     * @return listbox model
+     */
 
-		return new StandardListBoxModel()
-				.withEmptySelection()
-				.withAll(CredentialsProvider.lookupCredentials(
-						StandardUsernamePasswordCredentials.class,
-						Jenkins.getInstance(),
-						ACL.SYSTEM)
-				);
-	}
+    public ListBoxModel doFillTokenCredentialIdItems(@AncestorInPath Item context, @QueryParameter String remote) {
+        List<DomainRequirement> domainRequirements;
+        if (remote == null) {
+            domainRequirements = Collections.emptyList();
+        } else {
+            domainRequirements = URIRequirementBuilder.fromUri(remote.trim()).build();
+        }
 
+        return new StandardListBoxModel()
+                .includeEmptyValue()
+                .withMatching(
+                        CredentialsMatchers.anyOf(
+                                CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class)),
+                        CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials.class,
+                                context,
+                                ACL.SYSTEM,
+                                domainRequirements)
+                );
+    }
 }

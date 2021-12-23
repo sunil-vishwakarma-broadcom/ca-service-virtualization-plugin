@@ -1,0 +1,24 @@
+<div>
+  設定 JSON
+  </br>
+  <p>ポートおよび SSL 情報を含む設定オブジェクトの使用例</p>
+  <p style="color:#fff;background:#41444e;">{
+  "virtualService": {
+    "version": "2",
+    "name": "API_Test_1",
+    "description": "Invoke API V2",
+    "status": ""
+  },
+  "transportProtocol": {
+    "typeId": "HTTP",
+    "basePath": "/",
+    "useGateway": true,
+    "duptxns": true,
+    "hostHeaderPassThrough": false
+  },
+  "dataProtocol": {
+    "forRequest": true,
+    "typeId": "RESTDPH"
+  }
+}</p>
+</div>

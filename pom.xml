@@ -18,7 +18,7 @@
     <codesv.version>1.3.0</codesv.version>
     <java.level>8</java.level>
     <hpi-plugin.version>2.5</hpi-plugin.version>
-    <http.version>4.5.5</http.version>
+    <http.version>4.5.13</http.version>
   </properties>
 
   <name>CA Service Virtualization Plugin</name>

@@ -167,16 +167,6 @@ public class DevTestCreateAndDeployVsTest extends AbstractDevTestBuildStepTest {
     }
 
     @Test
-    public void testBuildMissingFile() throws Exception {
-        FreeStyleProject project = jenkins.createFreeStyleProject("test8");
-        DevTestCreateAndDeployVs builder = createPluginForIF1IF2(configObject, "true","false", "file:///C:/test-create-vsqqqqq.vsi", "file:///C:/test-create-vs.vsm");
-        project.getBuildersList().add(builder);
-
-        FreeStyleBuild build = jenkins.assertBuildStatus(Result.FAILURE, project.scheduleBuild2(0));
-        jenkins.assertLogContains("ERROR: /C:/test-create-vsqqqqq.vsi (No such file or directory)", build);
-    }
-
-    @Test
     public void testBuildWithSwagger() throws Exception {
 
         vs.useTransaction("createdeployVsURI");

@@ -161,19 +161,19 @@
   <!-- If you want this to appear on the wiki page: -->
   <developers>
     <developer>
-      <id>vlape02</id>
-      <name>Petr Vlasek</name>
-      <email>petr.vlasek@ca.com</email>
-      <url>https://github.com/PetrVlasek</url>
+      <id>sachinmaske</id>
+      <name>Sachin Maske</name>
+      <email>sachin.maske@broadcom.com</email>
+      <url>https://github.com/sachinmaske</url>
       <roles>
         <role>maintainer</role>
-    </roles>
+      </roles>
     </developer>
     <developer>
-      <id>rjakubco</id>
-      <name>Roman Jakubco</name>
-      <email>roman.jakubco@ca.com</email>
-      <url>https://github.com/rjakubco</url>
+      <id>sunil-vishwakarma-broadcom</id>
+      <name>Sunil Vishwakarma</name>
+      <email>sunil.vishwakarma@broadcom.com</email>
+      <url>https://github.com/sunil-vishwakarma-broadcom</url>
       <roles>
         <role>maintainer</role>
       </roles>

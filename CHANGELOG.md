@@ -1,5 +1,5 @@
 #### v1.0.5 (January 17th, 2022)
-- `FEATURE`: Create and Deploy VS steps.
+- `FEATURE`: Create and Deploy Virtual Service.
 - `FIXED`: Jobs always check for the resources on Master node instead of slave
 - `FIXED`: Folder level credentials can't be used while configuring custom registry
 

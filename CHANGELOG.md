@@ -1,3 +1,8 @@
+#### v1.0.5 (January 17th, 2022)
+- `FEATURE`: Create and Deploy VS steps.
+- `FIXED`: Jobs always check for the resources on Master node instead of slave
+- `FIXED`: Folder level credentials can't be used while configuring custom registry
+
 #### v1.0.2 (October 28th, 2018)
 
 - `FIXED` ([JENKINS-53782](https://issues.jenkins-ci.org/browse/JENKINS-53782)): Fixed issue with wrong test or test suite name displayed in the CA Service Virtualization report.

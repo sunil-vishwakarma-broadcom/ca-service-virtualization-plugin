@@ -381,6 +381,7 @@ public class DevTestDeployTest extends DefaultBuildStep {
 		if (jsonTree.isJsonObject()) {
 			JsonObject jsonObject = jsonTree.getAsJsonObject();
 			JsonElement testStatus = jsonObject.get("testStatus");
+			if(testStatus !=null)
 			return testStatus.getAsString();
 		}
 		return "";

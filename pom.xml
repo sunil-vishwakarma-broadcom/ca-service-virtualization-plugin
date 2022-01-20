@@ -23,6 +23,7 @@
 
   <name>CA Service Virtualization Plugin</name>
   <description>This plugin provides out of the box integration of CA Service Virtualization capabilities into continuous integration pipelines.</description>
+  <url>https://github.com/sachinmaske/ca-service-virtualization-plugin</url>
   <!-- The default licence for Jenkins OSS Plugins is MIT. Substitute for the applicable one if needed. -->
   <licenses>
     <license>
@@ -180,7 +181,6 @@
     </developer>
   </developers>
 
-  <url>https://wiki.jenkins.io/display/JENKINS/CA+Service+Virtualization+Plugin</url>
   <scm>
       <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
       <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>

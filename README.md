@@ -1,13 +1,30 @@
-# CA Service Virtualization Jenkins Plugin
+### CA Service Virtualization Jenkins Plugin
 
-This plugin provides out of the box integration of CA Service Virtualization capabilities into continuous integration pipelines.
+The CA Service Virtualization plug-in for Jenkins lets you manage virtual services and provision tests on CA Service Virtualization from your Jenkins UI.
 
-Please, visit the [plugin's wiki](https://wiki.jenkins.io/display/JENKINS/CA+Service+Virtualization+Plugin) for further information about the plug-in and Using Jenkins Plug-in for CA Service Virtualization documentation .
+#### Key Features:
 
-Follow the [CA Service Virtualization Jenkins plugin community](https://communities.ca.com/community/ca-devtest-community/content?filterID=contentstatus%5Bpublished%5D~category%5Bca-service-virtualization-jenkins-plugin%5D) to get the latest news, tips & tricks, best practices and support.
+* Create and Deploy virtual services
+* Start / Stop virtual services
+* Deploy / Undeploy virtual services
+* Deploy tests and test suites
+* Display of test or test suite Jenkins built-in reports
+* Use global or dynamic CA SV connection settings
+* CA Service Virtualization credentials supported by Jenkins Credentials store
+* Leverage Jenkins parameters to parametrize CA SV build steps
+* Full support of Jenkins Pipeline scripting
+
+Follow the [CA Service Virtualization Jenkins plugin community](https://community.broadcom.com/enterprisesoftware/communities/communityhomeblogs?CommunityKey=94bda077-625b-4914-8ac3-c88a06c2cc23) to get the latest news, tips & tricks, best practices and support.
+
+## Additional Information
+For detailed documentation see: [Jenkins Plug-in for CA Service Virtualization.](https://techdocs.broadcom.com/us/en/ca-enterprise-software/devops/devtest-solutions/10-7/using/using-jenkins-plugin-for-service-virtualization.html)
+
+See the Changelog to learn about new features, changes and fixes in the particular plugin version.
+
+Visit the CA DevTest Community pages to provide your feedback and receive community support.
 
 ### License
 
-Copyright (c) 2018 CA Technologies.
+Copyright (c) 2022 CA Technologies.
 
 Licensed under the [Eclipse Public License - v 2.0](https://www.eclipse.org/legal/epl-2.0/)

@@ -17,7 +17,7 @@ The CA Service Virtualization plug-in for Jenkins lets you manage virtual servic
 Follow the [CA Service Virtualization Jenkins plugin community](https://community.broadcom.com/enterprisesoftware/communities/communityhomeblogs?CommunityKey=94bda077-625b-4914-8ac3-c88a06c2cc23) to get the latest news, tips & tricks, best practices and support.
 
 ## Additional Information
-For detailed documentation see: [Jenkins Plug-in for CA Service Virtualization.](https://techdocs.broadcom.com/us/en/ca-enterprise-software/devops/devtest-solutions/10-7/using/using-jenkins-plugin-for-service-virtualization.html)
+For detailed documentation see: [Jenkins Plug-in for CA Service Virtualization.](https://techdocs.broadcom.com/casv-jenkins-plugin)
 
 See the Changelog to learn about new features, changes and fixes in the particular plugin version.
 

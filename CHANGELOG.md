@@ -1,3 +1,9 @@
+#### v1.0.7 (January 20th, 2022)
+- `FIXED` : Plugin documentation
+
+#### v1.0.6 (January 20th, 2022)
+- `FEATURE`([JENKINS-67640](https://issues.jenkins.io/browse/JENKINS-67640)): SV Plugin giving error on jenkins while test executing as passed on portal
+
 #### v1.0.5 (January 17th, 2022)
 - `FEATURE`: Create and Deploy Virtual Service.
 - `FIXED`: Jobs always check for the resources on Master node instead of slave

@@ -15,9 +15,13 @@
       <f:checkbox default="false">
       </f:checkbox>
     </f:entry>
+    <f:entry title="${%trustAnySSLCertificate}" field="trustAnySSLCertificate" name="trustAnySSLCertificate">
+      <f:checkbox default="false">
+      </f:checkbox>
+    </f:entry>
     <!--If we want to check connection in the future-->
     <f:validateButton
     title="${%TestConnection}" progress="${%Testing}"
-    method="testConnection" with="host,port,tokenCredentialId,secured"/>
+    method="testConnection" with="host,port,tokenCredentialId,secured,trustAnySSLCertificate"/>
   </f:section>
 </j:jelly>

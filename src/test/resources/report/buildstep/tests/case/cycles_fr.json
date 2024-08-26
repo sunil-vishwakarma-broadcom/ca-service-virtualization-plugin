@@ -1,0 +1,222 @@
+{
+  "_links": {
+    "self": {
+      "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles è[[BVPZ0]]"
+    }
+  },
+  "count": 10,
+  "_embedded": {
+    "CycleHistory": [
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/442F2822E5B211E7B46E020027E349EE è[[BVP20]]"
+          }
+        },
+        "cycleUniqueId": "à 442F2822E5B211E7B46E020027E349EE è[[BVP30]]",
+        "cycle": "à 0 è[[EDT0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:06-0500 è[[BVP60]]",
+        "endTime": "à 2017-12-20T13:19:11-0500 è[[BVP70]]",
+        "elapsedTimeInMillSec": 4443,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/46D568F3E5B211E7B46E020027E349EE è[[BVQB0]]"
+          }
+        },
+        "cycleUniqueId": "à 46D568F3E5B211E7B46E020027E349EE è[[BVQC0]]",
+        "cycle": "à 1 è[[EDU0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:11-0500 è[[BVQD0]]",
+        "endTime": "à 2017-12-20T13:19:16-0500 è[[BVQE0]]",
+        "elapsedTimeInMillSec": 4839,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/49B7EF79E5B211E7B46E020027E349EE è[[BVQF0]]"
+          }
+        },
+        "cycleUniqueId": "à 49B7EF79E5B211E7B46E020027E349EE è[[BVQG0]]",
+        "cycle": "à 2 è[[EDV0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:16-0500 è[[BVQH0]]",
+        "endTime": "à 2017-12-20T13:19:21-0500 è[[BVQI0]]",
+        "elapsedTimeInMillSec": 4964,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4CAD88CCE5B211E7B46E020027E349EE è[[BVQJ0]]"
+          }
+        },
+        "cycleUniqueId": "à 4CAD88CCE5B211E7B46E020027E349EE è[[BVQK0]]",
+        "cycle": "à 3 è[[EDW0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:21-0500 è[[BVQL0]]",
+        "endTime": "à 2017-12-20T13:19:25-0500 è[[BVQM0]]",
+        "elapsedTimeInMillSec": 4772,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4F85FD2FE5B211E7B46E020027E349EE è[[BVQN0]]"
+          }
+        },
+        "cycleUniqueId": "à 4F85FD2FE5B211E7B46E020027E349EE è[[BVQO0]]",
+        "cycle": "à 4 è[[EDX0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:25-0500 è[[BVQP0]]",
+        "endTime": "à 2017-12-20T13:19:30-0500 è[[BVQQ0]]",
+        "elapsedTimeInMillSec": 4679,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/525040C2E5B211E7B46E020027E349EE è[[BVQR0]]"
+          }
+        },
+        "cycleUniqueId": "à 525040C2E5B211E7B46E020027E349EE è[[BVQS0]]",
+        "cycle": "à 5 è[[EDY0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:30-0500 è[[BVQT0]]",
+        "endTime": "à 2017-12-20T13:19:34-0500 è[[BVQU0]]",
+        "elapsedTimeInMillSec": 4124,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/54C5AD95E5B211E7B46E020027E349EE è[[BVQV0]]"
+          }
+        },
+        "cycleUniqueId": "à 54C5AD95E5B211E7B46E020027E349EE è[[BVQW0]]",
+        "cycle": "à 6 è[[EDZ0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:34-0500 è[[BVQX0]]",
+        "endTime": "à 2017-12-20T13:19:39-0500 è[[BVQY0]]",
+        "elapsedTimeInMillSec": 5105,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/57D0CAB8E5B211E7B46E020027E349EE è[[BVQZ0]]"
+          }
+        },
+        "cycleUniqueId": "à 57D0CAB8E5B211E7B46E020027E349EE è[[BVQ20]]",
+        "cycle": "à 7 è[[ED20]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:39-0500 è[[BVQ30]]",
+        "endTime": "à 2017-12-20T13:19:44-0500 è[[BVQ40]]",
+        "elapsedTimeInMillSec": 4426,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5A744C6DE5B211E7B46E020027E349EE è[[BVQ50]]"
+          }
+        },
+        "cycleUniqueId": "à 5A744C6DE5B211E7B46E020027E349EE è[[BVQ60]]",
+        "cycle": "à 8 è[[ED30]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:44-0500 è[[BVQ70]]",
+        "endTime": "à 2017-12-20T13:19:48-0500 è[[BVRA0]]",
+        "elapsedTimeInMillSec": 4630,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5D373D00E5B211E7B46E020027E349EE è[[BVRB0]]"
+          }
+        },
+        "cycleUniqueId": "à 5D373D00E5B211E7B46E020027E349EE è[[BVRC0]]",
+        "cycle": "à 9 è[[ED40]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BVP40]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BVP50]]",
+        "startTime": "à 2017-12-20T13:19:48-0500 è[[BVRD0]]",
+        "endTime": "à 2017-12-20T13:19:53-0500 è[[BVRE0]]",
+        "elapsedTimeInMillSec": 4470,
+        "endedState": "à PASSED è[[BVQA0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      }
+    ]
+  }
+}

@@ -25,35 +25,34 @@
 
 package com.ca.devtest.jenkins.plugin.buildstep;
 
-import static com.ca.devtest.jenkins.plugin.util.Utils.createBasicAuthHeader;
-
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
+import com.ca.devtest.jenkins.plugin.config.RestClient;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
+import com.ca.devtest.jenkins.plugin.util.URLFactory;
 import com.ca.devtest.jenkins.plugin.util.Utils;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Item;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.FormValidation;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nonnull;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Build step for undeploying virtual service.
@@ -79,8 +78,8 @@ public class DevTestUndeployVs extends DefaultBuildStep {
 	 */
 	@DataBoundConstructor
 	public DevTestUndeployVs(boolean useCustomRegistry, String host, String port, String vseName,
-			String vsNames, String tokenCredentialId, boolean secured) {
-		super(useCustomRegistry, host, port, tokenCredentialId, secured);
+			String vsNames, String tokenCredentialId, boolean secured, boolean trustAnySSLCertificate) {
+		super(useCustomRegistry, host, port, tokenCredentialId, secured, trustAnySSLCertificate);
 		this.vseName = vseName;
 		if (vsNames != null && !vsNames.isEmpty()) {
 			if (vsNames.contains(",")) {
@@ -125,10 +124,11 @@ public class DevTestUndeployVs extends DefaultBuildStep {
 
 		String currentProtocol;
 		if (isUseCustomRegistry()) {
-			currentProtocol = isSecured() ? "https://" : "http://";
+			currentProtocol = isSecured() ? "https" : "http";
 		} else {
-			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
+			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https" : "http";
 		}
+		boolean trustAnySSLCertificate = isUseCustomRegistry() ? super.isTrustAnySSLCertificate(): DevTestPluginConfiguration.get().isTrustAnySSLCertificate();
 
 		if (vseName == null || vseName.isEmpty()) {
 			throw new AbortException(Messages.DevTestPlugin_emptyVseName());
@@ -147,15 +147,9 @@ public class DevTestUndeployVs extends DefaultBuildStep {
 			listener.getLogger()
 							.println(Messages.DevTestPlugin_devTestLocation(currentHost, currentPort));
 
-			String urlPath = "/api/Dcm/VSEs/" + resolvedVseName + "/" + vsName + "/";
-
-			HttpDelete httpDelete = new HttpDelete(
-					currentProtocol + currentHost + ":" + currentPort + urlPath);
-			httpDelete
-					.addHeader("Authorization", createBasicAuthHeader(currentUsername, currentPassword));
-
-			try (CloseableHttpClient client = HttpClients.createDefault();
-					CloseableHttpResponse response = client.execute(httpDelete)) {
+			String urlPath = String.format(APIEndpoints.UNDEPLOY_VS, resolvedVseName, vsName);
+			String undeployVSUrl  = new URLFactory(currentProtocol , currentHost, currentPort).buildUrl(urlPath);
+			try(CloseableHttpResponse response = RestClient.executeDelete(undeployVSUrl, currentUsername, currentPassword, trustAnySSLCertificate)){
 				int statusCode = response.getStatusLine().getStatusCode();
 
 				if (statusCode == 204) {

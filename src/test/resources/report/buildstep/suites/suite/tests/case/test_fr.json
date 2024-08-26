@@ -1,0 +1,116 @@
+{
+  "_links": {
+    "next": {
+      "href": "à http://localhost:1505/lisa-test-invoke/api/v1/tests/reports/EAC6BDD9E5AF11E7BADA020027E349EE/cycles è[[BMHQ0]]"
+    },
+    "self": {
+      "href": "à http://localhost:1505/lisa-test-invoke/api/v1/tests/reports/EAC6BDD9E5AF11E7BADA020027E349EE è[[BMHR0]]"
+    }
+  },
+  "testRunUniqueId": "à EAC6BDD9E5AF11E7BADA020027E349EE è[[BMHS0]]",
+  "testRunName": "à Run1User1Cycle è[[BMHT0]]",
+  "testcaseId": "à AFCE7A755B1A11E58280005056C00008 è[[BMHU0]]",
+  "testcaseName": "à test-data-driven-http-rest è[[BMHV0]]",
+  "testCaseDoc": "à Put documentation of the Test Case here. è[[BMHW0]]",
+  "startTime": "à 2017-12-20T13:02:20-0500 è[[BMHX0]]",
+  "endTime": "à 2017-12-20T13:02:25-0500 è[[BMHY0]]",
+  "elapsedTimeInMillSec": 55050,
+  "user": "à admin è[[CMX0]]",
+  "endedState": "à FAILED è[[BMHZ0]]",
+  "done": true,
+  "manuallyTerminated": false,
+  "passCount": 1,
+  "failCount": 0,
+  "warningCount": 0,
+  "abortCount": 0,
+  "passPercent": 100,
+  "failPercent": 0,
+  "abortPercent": 0,
+  "modelName": "à test-data-driven-http-rest è[[BMH20]]",
+  "loadPattern": "à Run N Times è[[BMH30]]",
+  "host": "à localhost è[[BMH40]]",
+  "simulatorName": "à tcp://localhost:2014/Simulator è[[BMH50]]",
+  "coordinatorId": "à em2ApF_ybUIQTNajqcZsP_r7rh-6qHabQ-UkOHfSBn0W è[[BMH60]]",
+  "coordinatorName": "à tcp://localhost:2011/Coordinator è[[BMH70]]",
+  "config": "à /root/lisatmp_10.2.5/lads/EAC6BDD9E5AF11E7BADA020027E349EE/Bank v5/Configs/project.config è[[BMIA0]]",
+  "ssvUsers": "à 1 è[[XB0]]",
+  "testcase": {
+    "id": "à AFCE7A755B1A11E58280005056C00008 è[[BMIB0]]",
+    "name": "à test-data-driven-http-rest è[[BMIC0]]",
+    "documentation": "à Put documentation of the Test Case here. è[[BMID0]]",
+    "resultState": "",
+    "steps": [
+      {
+        "uid": "à B4D3B9F75B1A11E58280005056C00008 è[[BMIE0]]",
+        "name": "à http GET /3/movie/49047/ è[[BMIF0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.ws.rest.RESTNode è[[BMIG0]]",
+        "quiet": false,
+        "next": "à http GET /3/movie/49163 è[[BMIH0]]"
+      },
+      {
+        "uid": "à B4D3B9F75B1A11E58280005056C00008 è[[BMIE0]]",
+        "name": "à http GET /3/movie/49163 è[[BMII0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.ws.rest.RESTNode è[[BMIG0]]",
+        "quiet": false,
+        "next": "à http GET /3/movie/49381 è[[BMIJ0]]"
+      },
+      {
+        "uid": "à B4D3B9F75B1A11E58280005056C00008 è[[BMIE0]]",
+        "name": "à http GET /3/movie/49381 è[[BMIK0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.ws.rest.RESTNode è[[BMIG0]]",
+        "quiet": false,
+        "next": "à GET empty column value è[[BMIL0]]"
+      },
+      {
+        "uid": "à B0CEBA81908F11E6B40D60F81DD00CF4 è[[BMIM0]]",
+        "name": "à GET empty column value è[[BMIN0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.ws.rest.RESTNode è[[BMIG0]]",
+        "quiet": false,
+        "next": "à http GET /3/movie/notfound è[[BMIO0]]"
+      },
+      {
+        "uid": "à B4D3B9F75B1A11E58280005056C00008 è[[BMIE0]]",
+        "name": "à http GET /3/movie/notfound è[[BMIP0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.ws.rest.RESTNode è[[BMIG0]]",
+        "quiet": false,
+        "next": "à end è[[XC0]]"
+      },
+      {
+        "uid": "à AFCE7A775B1A11E58280005056C00008 è[[BMIQ0]]",
+        "name": "à abort è[[CMY0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.test.AbortStep è[[BMIR0]]",
+        "quiet": true,
+        "next": ""
+      },
+      {
+        "uid": "à AFCE7A795B1A11E58280005056C00008 è[[BMIS0]]",
+        "name": "à fail è[[XD0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.test.Abend è[[BMIT0]]",
+        "quiet": true,
+        "next": "à abort è[[CMZ0]]"
+      },
+      {
+        "uid": "à AFCE7A7B5B1A11E58280005056C00008 è[[BMIU0]]",
+        "name": "à end è[[XE0]]",
+        "documentation": null,
+        "type": "à com.itko.lisa.test.NormalEnd è[[BMIV0]]",
+        "quiet": true,
+        "next": "à fail è[[XF0]]"
+      }
+    ]
+  },
+  "stagingDocument": {
+    "name": "à Run1User1Cycle è[[BMIW0]]",
+    "documentation": "",
+    "distributionType": "à com.itko.lisa.coordinator.runpatterns.PercentDistribution è[[BMIX0]]",
+    "loadPatternType": "à com.itko.lisa.coordinator.runpatterns.RunNTimesPattern è[[BMIY0]]",
+    "think": "à 100 è[[XG0]]"
+  }
+}

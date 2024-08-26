@@ -61,7 +61,7 @@ public class DevTestTestPublisher extends Recorder implements SimpleBuildStep {
 
 	@Override
 	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace,
-			@Nonnull Launcher launcher, @Nonnull TaskListener listener) {
+						@Nonnull Launcher launcher, @Nonnull TaskListener listener) {
 		Report report = new TestInvokeApiResultParser(listener.getLogger())
 				.parse(run.getRootDir().toString() + "/report");
 		DevTestResultAction devTestResultAction = new DevTestResultAction(run, report);

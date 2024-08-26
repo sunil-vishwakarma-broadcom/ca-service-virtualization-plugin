@@ -25,19 +25,18 @@
 
 package com.ca.devtest.jenkins.plugin.slavecallable;
 
+import com.ca.devtest.jenkins.plugin.Messages;
+import com.ca.devtest.jenkins.plugin.config.RestClient;
 import com.ca.devtest.jenkins.plugin.data.DeployMarData;
-import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
 import com.ca.devtest.jenkins.plugin.data.DevTestReturnValue;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.io.*;
-import hudson.model.TaskListener;
-import org.apache.http.HttpEntity;
+import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
+import com.ca.devtest.jenkins.plugin.util.URLFactory;
 import hudson.FilePath;
+import hudson.model.TaskListener;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -45,14 +44,15 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import com.ca.devtest.jenkins.plugin.Messages;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.InetAddress;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import static com.ca.devtest.jenkins.plugin.util.Utils.createBasicAuthHeader;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class used for executing the jobs on slave
@@ -82,14 +82,9 @@ public class DevTestDeployVsCallable extends AbstractDevTestMasterToSlaveCallabl
                                     data.getPort()));
 
                     HttpEntity entity = createPostEntity(getWorkspace(), getListener(), marFilePath);
-                    HttpPost httpPost = new HttpPost(data.getProtocol() + data.getRegistry() + ":" + data.getPort() + data.getAPIUrl());
-                    httpPost.addHeader("Authorization", createBasicAuthHeader(data.getUsername(), data.getPassword()));
-                    httpPost.addHeader("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
-                    httpPost.setEntity(entity);
-
-                    try (CloseableHttpClient client = HttpClients.createDefault();
-                         CloseableHttpResponse response = client.execute(httpPost)) {
-
+                    Map<String, String> headers = Collections.singletonMap("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
+                    String testDeployUrl  = new URLFactory(data.getProtocol() , data.getRegistry(), data.getPort()).buildUrl(data.getAPIUrl());
+                    try(CloseableHttpResponse response = RestClient.executePost(testDeployUrl , data.getUsername(), data.getPassword(), data.isTrustAnySSLCertificate(), entity, headers)){
                         int statusCode = response.getStatusLine().getStatusCode();
                         String responseBody = EntityUtils.toString(response.getEntity());
 
@@ -110,8 +105,6 @@ public class DevTestDeployVsCallable extends AbstractDevTestMasterToSlaveCallabl
                         }
                     }
                 }
-        } catch(RuntimeException e){
-            devTestReturnValue.setMessage(e.getMessage());
         } catch(Exception e){
             devTestReturnValue.setMessage(e.getMessage());
         }

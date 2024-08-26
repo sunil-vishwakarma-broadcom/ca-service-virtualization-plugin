@@ -1,0 +1,9 @@
+{
+  "_links": {
+    "next": {
+      "href": "http://marpa24N223060:1505/lisa-test-invoke/api/v1/suites/reports/2C81BEA15DC911E8A5A80050569C3565/tests",
+    },
+    "self": {
+      "href": "http://marpa24N223060:1505/lisa-test-invoke/api/v1/suites/reports/2C81BEA15DC911E8A5A80050569C3565"
+    }
+  }

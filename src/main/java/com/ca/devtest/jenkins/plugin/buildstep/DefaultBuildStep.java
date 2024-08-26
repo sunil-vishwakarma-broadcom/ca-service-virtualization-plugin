@@ -30,7 +30,6 @@ import com.ca.devtest.jenkins.plugin.util.Utils;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.Builder;
@@ -38,7 +37,6 @@ import hudson.util.Secret;
 import java.io.IOException;
 import javax.annotation.Nonnull;
 import jenkins.tasks.SimpleBuildStep;
-import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Parent build step for all specific build steps holding attributes of custom registry.
@@ -54,6 +52,7 @@ public abstract class DefaultBuildStep extends Builder implements SimpleBuildSte
 	private  Secret password;
 	private final String tokenCredentialId;
 	private boolean secured;
+	private boolean trustAnySSLCertificate;
 
 	/**
 	 * Constructor.
@@ -65,12 +64,13 @@ public abstract class DefaultBuildStep extends Builder implements SimpleBuildSte
 	 * @param secured           if https should be for custom registry
 	 */
 	public DefaultBuildStep(boolean useCustomRegistry, String host, String port,
-			String tokenCredentialId, boolean secured) {
+			String tokenCredentialId, boolean secured, boolean trustAnySSLCertificate) {
 		this.useCustomRegistry = useCustomRegistry;
 		this.host = host;
 		this.port = port;
 		this.tokenCredentialId = tokenCredentialId;
 		this.secured = secured;
+		this.trustAnySSLCertificate = trustAnySSLCertificate;
 		StandardUsernamePasswordCredentials jenkinsCredentials = Utils
 				.lookupCredentials(null, this.tokenCredentialId);
 		if (jenkinsCredentials != null) {
@@ -108,6 +108,9 @@ public abstract class DefaultBuildStep extends Builder implements SimpleBuildSte
 
 	public boolean isSecured() {
 		return secured;
+	}
+	public boolean isTrustAnySSLCertificate() {
+		return trustAnySSLCertificate;
 	}
 
 	protected void updateCredentails(Run<?, ?> run){

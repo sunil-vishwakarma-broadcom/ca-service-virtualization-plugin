@@ -25,15 +25,16 @@
 
 package com.ca.devtest.jenkins.plugin;
 
-import static com.ca.devtest.jenkins.plugin.util.Utils.createBasicAuthHeader;
-
+import com.ca.devtest.jenkins.plugin.config.RestClient;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
+import com.ca.devtest.jenkins.plugin.constants.ConfigProperties;
+import com.ca.devtest.jenkins.plugin.util.URLFactory;
 import com.ca.devtest.jenkins.plugin.util.Utils;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import hudson.Extension;
 import hudson.Util;
-import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
@@ -41,19 +42,17 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
-import java.io.IOException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
-import org.kohsuke.stapler.AncestorInPath;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Main point for DevTest plugin in jenkins used by all build and post-build steps. This class
@@ -71,8 +70,7 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 	 * @return descriptor
 	 */
 	public static DevTestPluginDescriptor get() {
-		return (DevTestPluginDescriptor) Jenkins.getInstance()
-																						.getDescriptor(DevTestPluginConfiguration.class);
+		return (DevTestPluginDescriptor) Jenkins.getInstance().getDescriptor(DevTestPluginConfiguration.class);
 	}
 
 	/**
@@ -94,6 +92,7 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 		private Secret password;
 		private boolean secured = false;
 		private String tokenCredentialId;
+		private boolean trustAnySSLCertificate = false;
 
 		/**
 		 * Constructor.
@@ -118,12 +117,12 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 		@Override
 		public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
 			req.bindJSON(this, formData);
-			this.host = formData.getJSONObject("DevTestPluginConfiguration").getString("host");
-			this.port = formData.getJSONObject("DevTestPluginConfiguration").getString("port");
-			this.tokenCredentialId = formData.getJSONObject("DevTestPluginConfiguration")
-																			 .getString("tokenCredentialId");
-			this.secured = Boolean
-					.valueOf(formData.getJSONObject("DevTestPluginConfiguration").getString("secured"));
+			JSONObject formDataJsonObject = formData.getJSONObject(ConfigProperties.PLUGIN_CONFIG);
+			this.host = formDataJsonObject.getString("host");
+			this.port = formDataJsonObject.getString("port");
+			this.tokenCredentialId = formDataJsonObject.getString("tokenCredentialId");
+			this.secured = formDataJsonObject.getBoolean("secured");
+			this.trustAnySSLCertificate = formDataJsonObject.getBoolean("trustAnySSLCertificate");
 
 			StandardUsernamePasswordCredentials credentials = Utils
 					.lookupCredentials(null, this.tokenCredentialId);
@@ -153,28 +152,21 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 		public FormValidation doTestConnection(@QueryParameter("host") final String host,
 				@QueryParameter("port") final String port,
 				@QueryParameter("tokenCredentialId") final String tokenCredentialId,
-				@QueryParameter("secured") final boolean secured) {
+				@QueryParameter("secured") final boolean secured,
+				@QueryParameter("trustAnySSLCertificate") final boolean trustAnySSLCertificate) {
+
 			Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-
-			try (CloseableHttpClient client = HttpClients.createDefault()) {
-
-				String protocol = secured ? "https://" : "http://";
-
-				HttpGet httpGet = new HttpGet(
-						protocol + host + ":" + port + "/api/Dcm/");
-
-				StandardUsernamePasswordCredentials credentials = Utils
-						.lookupCredentials(null, tokenCredentialId);
-
-				if (credentials == null) {
-					return FormValidation.error(Messages.DevTestPlugin_DescriptorImpl_requiredCred());
-				}
-				String username = credentials.getUsername();
-				String password = Secret.toString(credentials.getPassword());
-
-				httpGet.addHeader("Authorization", createBasicAuthHeader(username, password));
-				httpGet.addHeader("Accept", "application/vnd.ca.lisaInvoke.dcm+json");
-				CloseableHttpResponse response = client.execute(httpGet);
+			String protocol = secured ? "https" : "http";
+			StandardUsernamePasswordCredentials credentials = Utils
+					.lookupCredentials(null, tokenCredentialId);
+			if (credentials == null) {
+				return FormValidation.error(Messages.DevTestPlugin_DescriptorImpl_requiredCred());
+			}
+			String username = credentials.getUsername();
+			String password = Secret.toString(credentials.getPassword());
+			String connectivityTestUrl  = new URLFactory(protocol, host, port).buildUrl(APIEndpoints.TEST_CONNECTION_API);
+			Map<String, String> headers = Collections.singletonMap("Accept", "application/vnd.ca.lisaInvoke.dcm+json");
+			try (CloseableHttpResponse response = RestClient.executeGet(connectivityTestUrl, username, password, trustAnySSLCertificate, headers)) {
 
 				int statusCode = response.getStatusLine().getStatusCode();
 				String responseBody = EntityUtils.toString(response.getEntity());
@@ -188,7 +180,7 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 					return FormValidation
 							.error(Messages.DevTestPlugin_connectionFailed(statusCode, responseBody));
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				return FormValidation.error(Messages.DevTestPlugin_clientFailed(e.getMessage()));
 			}
 		}
@@ -246,6 +238,10 @@ public class DevTestPluginConfiguration extends JobProperty<Job<?, ?>> {
 
 		public boolean isSecured() {
 			return secured;
+		}
+
+		public boolean isTrustAnySSLCertificate() {
+			return trustAnySSLCertificate;
 		}
 
 		/**

@@ -27,9 +27,12 @@ package com.ca.devtest.jenkins.plugin.buildstep;
 
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
+import com.ca.devtest.jenkins.plugin.config.RestClient;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
+import com.ca.devtest.jenkins.plugin.exception.InvalidInputException;
 import com.ca.devtest.jenkins.plugin.postbuild.parser.TestInvokeApiResultParser;
 import com.ca.devtest.jenkins.plugin.postbuild.report.Report;
-import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
+import com.ca.devtest.jenkins.plugin.util.URLFactory;
 import com.ca.devtest.jenkins.plugin.util.Utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,49 +41,27 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Item;
-import hudson.model.AbstractProject;
-import hudson.model.Result;
-import hudson.model.Run;
-import hudson.model.TaskListener;
+import hudson.model.*;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import java.io.File;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.EntityUtils;
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+
+import javax.annotation.Nonnull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.FileWriterWithEncoding;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Build step for starting test/testsuite.
@@ -89,17 +70,16 @@ import org.kohsuke.stapler.AncestorInPath;
  */
 public class DevTestDeployTest extends DefaultBuildStep {
 
-	private static final String REPORT_SUITE_URL = "/lisa-test-invoke/api/v1/suites/reports/";
-	private static final String REPORT_TEST_URL = "/lisa-test-invoke/api/v1/tests/reports/";
-
-	private static final String RUN_TEST_URL = "/lisa-test-invoke/api/v1/tests/run";
-	private static final String RUN_SUITE_URL = "/lisa-test-invoke/api/v1/suites/run";
-
 	private final List<String> endStates =
 			Arrays.asList("ENDED", "PASSED", "FAILED", "ABORTED", "FAILED_TO_STAGE");
 
 	private final String testType;
 	private String marFilePath;
+	private String stagingDocRelativePath;
+	private String stagingDocFilePath;
+	private String configRelativePath;
+	private String configFilePath;
+	private String coordinatorServerName;
 
 	private final Boolean test;
 
@@ -117,9 +97,16 @@ public class DevTestDeployTest extends DefaultBuildStep {
 	 */
 	@DataBoundConstructor
 	public DevTestDeployTest(boolean useCustomRegistry, String host, String port, String marFilePath,
-			String testType, String tokenCredentialId, boolean secured) {
-		super(useCustomRegistry, host, port, tokenCredentialId, secured);
+			String stagingDocRelativePath, String stagingDocFilePath, String configRelativePath, String configFilePath, String coordinatorServerName,
+			String testType, String tokenCredentialId, boolean secured, boolean trustAnySSLCertificate) {
+
+		super(useCustomRegistry, host, port, tokenCredentialId, secured, trustAnySSLCertificate);
 		this.marFilePath = marFilePath;
+		this.stagingDocRelativePath = stagingDocRelativePath;
+		this.stagingDocFilePath = stagingDocFilePath;
+		this.configRelativePath = configRelativePath;
+		this.configFilePath = configFilePath;
+		this.coordinatorServerName= coordinatorServerName;
 		this.testType = testType;
 		this.test = testType.equalsIgnoreCase("tests");
 	}
@@ -141,175 +128,126 @@ public class DevTestDeployTest extends DefaultBuildStep {
 		return marFilePath;
 	}
 
+	public String getStagingDocRelativePath() {
+		return stagingDocRelativePath;
+	}
+
+	public String getStagingDocFilePath() {
+		return stagingDocFilePath;
+	}
+
+	public String getConfigRelativePath() {
+		return configRelativePath;
+	}
+
+	public String getConfigFilePath() {
+		return configFilePath;
+	}
+
+	public String getCoordinatorServerName() {
+		return coordinatorServerName;
+	}
+
 	@Override
 	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace,
-			@Nonnull Launcher launcher, @Nonnull TaskListener listener)
+						  @Nonnull Launcher launcher, @Nonnull TaskListener listener)
 			throws InterruptedException, IOException {
 
 		Utils.checkRegistryEndpoint(this);
 		this.updateCredentails(run);
 
-		String currentHost = isUseCustomRegistry() ? super.getHost()
-				: DevTestPluginConfiguration.get().getHost();
-		currentHost = Utils.resolveParameter(currentHost, run, listener);
+		String currentHost = getCurrentHost();
+		String currentPort = getCurrentPort();
+		String currentProtocol = getCurrentProtocol();
+		boolean trustAnySSLCertificate = getTrustAnySSLCertificate();
 
-		String currentPort = isUseCustomRegistry() ? super.getPort()
-				: DevTestPluginConfiguration.get().getPort();
-		currentPort = Utils.resolveParameter(currentPort, run, listener);
-
-		String currentProtocol;
-		if (isUseCustomRegistry()) {
-			currentProtocol = isSecured() ? "https://" : "http://";
-		} else {
-			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
-		}
-
-		String baseUrl = currentProtocol + currentHost + ":" + currentPort + "/";
 		FilePath workDir = new FilePath(run.getRootDir());
-		String runItemId;
-		String runItemStatus;
-		//check/validate marFilePath parameter
-		if (marFilePath == null || marFilePath.isEmpty()) {
-			throw new AbortException(Messages.DevTestDeployTest_missing_mar());
-		}
-		List<String> resMarFilePath = Utils.resolveParameters(
-				Collections.singletonList(marFilePath), run, listener);
+		validateRequiredMarFilePath();
+		String resolvedMarFilePath = resolveParameter(marFilePath, run, listener);
+		String resolvedStagingDocRelativePath = Utils.resolveParameter(getStagingDocRelativePath(), run, listener);
+		String resolvedStagingDocFilePath = resolveParameter(getStagingDocFilePath(), run, listener);
+		String resolvedConfigRelativePath = Utils.resolveParameter(getConfigRelativePath(), run, listener);
+		String resolvedConfigFilePath = resolveParameter(getConfigFilePath(), run, listener);
+		String resolvedCoordinatorServerName = Utils.resolveParameter(getCoordinatorServerName(), run, listener);
 
-		String resolvedMarFilePath = resMarFilePath.get(0);
 		listener.getLogger().println(Messages.DevTestDeployTest_deploying(resolvedMarFilePath));
 		listener.getLogger().println(Messages.DevTestPlugin_devTestLocation(currentHost, currentPort));
 
-		//send test/suite to devtest
-		CloseableHttpClient client = null;
+		URLFactory urlFactory = new URLFactory(currentProtocol , currentHost, currentPort);
+		HttpEntity entity = createPostEntity(workspace, listener, resolvedMarFilePath, resolvedStagingDocRelativePath, resolvedStagingDocFilePath, resolvedConfigRelativePath, resolvedConfigFilePath, resolvedCoordinatorServerName);
+		String itemUrl = isTest() ? urlFactory.buildUrl(APIEndpoints.RUN_TEST_URL) : urlFactory.buildUrl(APIEndpoints.RUN_SUITE_URL);
 
-		try {
-			HttpHost host = new HttpHost(currentHost, Integer.parseInt(currentPort));
-			client = createHttpClient(host);
+		String currentUsername = getCurrentUsername();
+		String currentPassword = getCurrentPassword();
 
-			HttpEntity entity = createPostEntity(workspace, listener, resolvedMarFilePath);
-			String itemUrl = baseUrl + (isTest() ? RUN_TEST_URL : RUN_SUITE_URL);
-			HttpPost httpPost = new HttpPost(itemUrl);
-			httpPost.setHeader("Accept", "application/json");
-			httpPost.setEntity(entity);
-			CloseableHttpResponse response = client.execute(httpPost);
-
-			try {
-				int statusCode = response.getStatusLine().getStatusCode();
-				String responseBody = EntityUtils.toString(response.getEntity());
-				if (statusCode == 200) {
-					listener.getLogger().println(Messages.DevTestPlugin_responseBody(responseBody));
-				} else {
-					listener.getLogger().println(Messages.DevTestDeployTest_error());
-					throw new AbortException(Messages.DevTestPlugin_responseStatus(statusCode, responseBody));
-				}
-				runItemId = parseResponseForId(responseBody);
-			} finally {
-				response.close();
-			}
-
-			listener.getLogger()
-							.println(Messages.DevTestDeployTest_success(runItemId));
-
-			//			client = createHttpClient(currentHost, currentPort);
-			runItemStatus = waitForEnd(client, itemUrl + "/" + runItemId);
-			listener.getLogger().println(Messages.DevTestDeployTest_status(runItemStatus));
-
-			//download reports for test/suite
-			if (isTest()) {
-				downloadTestOutput(client, baseUrl,
-						new FilePath(workDir, "report/" + runItemId + "/tests/case"), runItemId,
-						listener.getLogger());
-			} else {
-				downloadSuiteOutput(client, baseUrl,
-						new FilePath(workDir, "report/" + runItemId + "/suites/suite"), runItemId,
-						listener.getLogger());
-			}
-
-			if (runItemStatus.equalsIgnoreCase("FAILED")) {
-				run.setResult(Result.UNSTABLE);
-			} else if (runItemStatus.equalsIgnoreCase("ABORTED")
-					|| runItemStatus.equalsIgnoreCase("FAILED_TO_STAGE")) {
-				run.setResult(Result.FAILURE);
-			} else {
-				run.setResult(Result.SUCCESS);
-			}
-
-			//Test/Suite run details: Z tests executed (Y tests passed, X tests failed)
-			Report report = new TestInvokeApiResultParser(listener.getLogger())
-					.parseStep(run.getRootDir().toString() + "/report/" + runItemId);
-			listener.getLogger().println(Messages.DevTestDeployTest_statusDetails(report.getTotalCount(),
-					report.getSuccessfullTests().size(),report.getFailCount()));
-
-		} finally {
-			if (client != null) {
-				client.close();
-			}
-		}
-	}
-
-	private CloseableHttpClient createHttpClient(HttpHost host) {
-
-		String currentUsername = isUseCustomRegistry() ? super.getUsername()
-				: DevTestPluginConfiguration.get().getUsername();
-		String currentPassword = isUseCustomRegistry() ? super.getPassword().getPlainText()
-				: DevTestPluginConfiguration.get().getPassword().getPlainText();
-
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(
-				new AuthScope(host),
-				new UsernamePasswordCredentials(currentUsername, currentPassword));
-
-		return HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+		String runItemId = sendPostRequestAndGetItemId(itemUrl, currentUsername, currentPassword, trustAnySSLCertificate, entity, listener);
+		logSuccessMessage(runItemId, listener);
+		String runItemResponseBody = waitForEnd(itemUrl + "/" + runItemId, currentUsername, currentPassword, trustAnySSLCertificate);
+		String runItemStatus = parseResponseForStatus(runItemResponseBody);
+		logRunItemStatus(runItemStatus, listener);
+		run.addAction(new ParametersAction(new StringParameterValue("deployTestResponse", runItemResponseBody)));
+		downloadReportsAndSetRunResult(runItemStatus, runItemId, urlFactory, currentUsername, currentPassword, trustAnySSLCertificate, workDir, run, listener);
 
 	}
 
 	/**
 	 * periodically is checking the test status until it's something else than running.
 	 */
-	private String waitForEnd(CloseableHttpClient client, String checkUrl)
+	private String waitForEnd(String checkUrl, String currentUsername, String currentPassword, boolean trustAnySSLCertificate)
 			throws IOException, InterruptedException {
-		HttpGet httpGet = new HttpGet(checkUrl);
-		CloseableHttpResponse resp = null;
-		String body = "";
+		String body ;
 		String state;
 		do {
-			try {
-				Thread.sleep(1900); //could be configurable if needed in future
-				resp = client.execute(httpGet);
-				body = EntityUtils.toString(resp.getEntity());
+			Thread.sleep(1900);
+			try(CloseableHttpResponse response = RestClient.executeGet(checkUrl, currentUsername, currentPassword, trustAnySSLCertificate, null)){
+				body = EntityUtils.toString(response.getEntity());
 				state = parseResponseForStatus(body);
-			} finally {
-				if(resp!=null) {
-					resp.close();
-				}
 			}
 		} while (!this.endStates.contains(state));
-		return state;
+		return body;
 	}
 
-	private HttpEntity createPostEntity(FilePath workspace, TaskListener listener,
-			String marFilePath) throws IOException, InterruptedException {
-		FilePath marFile = workspace.child(marFilePath);
-		File file = marFile.act(new MyFileCallable());
-//		String tmp = marFile.readToString();
-		if (file != null) {
-			//if remote, make tmp copy to be able to send file to devtest
-			ContentBody cbody = null;
-			if (marFile.isRemote()) {
-				//we need to read remote file in advance to be available for httpclient
-				byte[] data = IOUtils.toByteArray(marFile.read());
-				cbody = new ByteArrayBody(data, marFilePath);
-			} else {
-				cbody = new FileBody(file);
-			}
-			return MultipartEntityBuilder.create()
-																	 .addPart("file", cbody)
-																	 .build();
-		} else {
-			listener.getLogger()
-							.println(Messages.DevTestPlugin_missingFile(marFilePath));
-			throw new FileNotFoundException(Messages.DevTestPlugin_fileEx(marFilePath));
+	private HttpEntity createPostEntity(FilePath workspace, TaskListener listener, String marFilePath, String resolvedStagingDocRelativePath, String resolvedStagingDocFilePath, String resolvedConfigRelativePath, String resolvedConfigFilePath, String resolvedCoordinatorServerName) throws IOException, InterruptedException {
+
+		MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+		multipartEntityBuilder.setContentType(ContentType.MULTIPART_FORM_DATA);
+
+		addBodyPartWithLogging(workspace, multipartEntityBuilder, "file", marFilePath, "MAR File", listener);
+
+		addTextBodyIfNotBlank(multipartEntityBuilder, "stagingDoc", resolvedStagingDocRelativePath, "Staging Doc", listener);
+		addBodyPartWithLogging(workspace, multipartEntityBuilder, "stagingDocFile", resolvedStagingDocFilePath, "Staging Doc File", listener);
+
+		addTextBodyIfNotBlank(multipartEntityBuilder, "config", resolvedConfigRelativePath, "Config", listener);
+		addBodyPartWithLogging(workspace, multipartEntityBuilder, "configFile", resolvedConfigFilePath, "Config File", listener);
+
+		addTextBodyIfNotBlank(multipartEntityBuilder, "coordinatorServerName", resolvedCoordinatorServerName, "Coordinator server name", listener);
+
+		return multipartEntityBuilder.build();
+	}
+
+	private void addTextBodyIfNotBlank(MultipartEntityBuilder multipartEntityBuilder, String name, String value, String logMessage, TaskListener listener) {
+		if (StringUtils.isNotBlank(value)) {
+			multipartEntityBuilder.addTextBody(name, StringUtils.trim(value));
+			listener.getLogger().println(logMessage + ": " + StringUtils.trim(value));
 		}
+	}
+
+	private void addBodyPartWithLogging(FilePath workspace, MultipartEntityBuilder multipartEntityBuilder, String name, String filePath, String logMessage, TaskListener listener) throws IOException, InterruptedException {
+		if (StringUtils.isNotBlank(filePath)) {
+			try {
+				Utils.addBodyPart(workspace, multipartEntityBuilder, name, StringUtils.trim(filePath));
+				listener.getLogger().println(logMessage + ": " + StringUtils.trim(filePath));
+			} catch (InvalidInputException ex) {
+				handleFileNotFound(listener, ex.getMessage());
+			}
+		}
+	}
+
+
+	private void handleFileNotFound(TaskListener listener, String filePath) throws FileNotFoundException {
+		String errorMessage = Messages.DevTestPlugin_missingFile(filePath);
+		listener.getLogger().println(errorMessage);
+		throw new FileNotFoundException(Messages.DevTestPlugin_fileEx(filePath));
 	}
 
 	// Localization -> Messages generated by maven plugin check target folder
@@ -363,73 +301,165 @@ public class DevTestDeployTest extends DefaultBuildStep {
 	}
 
 	private String parseResponseForId(String resp) {
-		JsonParser parser = new JsonParser();
-		JsonElement jsonTree = parser.parse(resp);
-
-		if (jsonTree.isJsonObject()) {
-			JsonObject jsonObject = jsonTree.getAsJsonObject();
-
-			JsonElement id = jsonObject.get("id");
-			return id.getAsString();
-		}
-		return "";
+		return parseResponseForKey(resp, "id");
 	}
 
 	private String parseResponseForStatus(String resp) {
+		return parseResponseForKey(resp, "testStatus");
+	}
+
+	private String parseResponseForKey(String resp, String key) {
 		JsonParser parser = new JsonParser();
 		JsonElement jsonTree = parser.parse(resp);
+
 		if (jsonTree.isJsonObject()) {
 			JsonObject jsonObject = jsonTree.getAsJsonObject();
-			JsonElement testStatus = jsonObject.get("testStatus");
-			if(testStatus !=null)
-			return testStatus.getAsString();
+
+			JsonElement element = jsonObject.get(key);
+			if (element != null) {
+				return element.getAsString();
+			}
 		}
 		return "";
 	}
 
-	private void downloadTestOutput(CloseableHttpClient client, String baseUrl, FilePath storeDir,
-			String testId, PrintStream logger) throws IOException, InterruptedException {
-		String reportUrl = baseUrl + REPORT_TEST_URL + "/" + testId;
-		downloadFile(client, reportUrl, new FilePath(storeDir, "test.json"));
-		String cycleUrl = reportUrl + "/cycles";
-		downloadFile(client, cycleUrl, new FilePath(storeDir, "cycles.json"));
+	private void downloadTestOutput(URLFactory urlFactory, String currentUsername, String currentPassword, boolean trustAnySSLCertificate, FilePath storeDir,
+			String testId) throws IOException, InterruptedException {
+		String reportUrl = urlFactory.buildUrl(String.format(APIEndpoints.REPORT_URL, testId));
+		downloadFile(reportUrl, currentUsername, currentPassword, trustAnySSLCertificate, new FilePath(storeDir, "test.json"));
+
+		String cycleUrl = urlFactory.buildUrl(String.format(APIEndpoints.CYCLE_URL, testId));
+		downloadFile(cycleUrl, currentUsername, currentPassword, trustAnySSLCertificate, new FilePath(storeDir, "cycles.json"));
 	}
 
-	private void downloadSuiteOutput(CloseableHttpClient client, String baseUrl, FilePath storeDir,
+	private void downloadSuiteOutput(URLFactory urlFactory, String currentUsername, String currentPassword, boolean trustAnySSLCertificate, FilePath storeDir,
 			String suitId, PrintStream logger) throws IOException, InterruptedException {
-		String suiteUrl = baseUrl + REPORT_SUITE_URL + "/" + suitId;
+		String suiteUrl = urlFactory.buildUrl(String.format(APIEndpoints.SUITE_REPORT_URL, suitId));
 		FilePath suiteJson = new FilePath(storeDir, "suite.json");
-		downloadFile(client, suiteUrl, suiteJson);
+		downloadFile(suiteUrl, currentUsername, currentPassword, trustAnySSLCertificate, suiteJson);
+
 		//get tests info for suite
+		String testSuitUrl = urlFactory.buildUrl(String.format(APIEndpoints.SUITE_TESTS_REPORT_URL, suitId));
 		FilePath testsSuiteJson = new FilePath(storeDir, "testsSuite.json");
-		downloadFile(client, suiteUrl + "/tests", testsSuiteJson);
-		TestInvokeApiResultParser parser = new TestInvokeApiResultParser(logger);
+		downloadFile(testSuitUrl, currentUsername, currentPassword, trustAnySSLCertificate, testsSuiteJson);
+
 		//get ids for all tests in suite and get reports for them
+		TestInvokeApiResultParser parser = new TestInvokeApiResultParser(logger);
 		List<String> testIds = parser.getCasesIdsFromSuite(testsSuiteJson.readToString());
+		downloadTestFiles(suiteUrl, testIds, currentUsername, currentPassword, trustAnySSLCertificate, storeDir);
+	}
+	private void downloadTestFiles(String suiteUrl, List<String> testIds, String currentUsername, String currentPassword, boolean trustAnySSLCertificate, FilePath storeDir)
+			throws IOException, InterruptedException {
 		int i = 1;
 		for (String id : testIds) {
-			downloadFile(client, suiteUrl + "/tests/" + id, new FilePath(storeDir,
-					"tests/case" + i + "/test.json"));
-			downloadFile(client, suiteUrl + "/tests/" + id + "/cycles", new FilePath(storeDir,
-					"tests/case" + i + "/cycles.json"));
+			downloadFile(suiteUrl + "/tests/" + id, currentUsername, currentPassword, trustAnySSLCertificate,
+					new FilePath(storeDir, "tests/case" + i + "/test.json"));
+			downloadFile(suiteUrl + "/tests/" + id + "/cycles", currentUsername, currentPassword, trustAnySSLCertificate,
+					new FilePath(storeDir, "tests/case" + i + "/cycles.json"));
 			i++;
 		}
 	}
 
-	private void downloadFile(CloseableHttpClient client, String url, FilePath storePath)
+	private void downloadFile(String url, String currentUsername, String currentPassword, boolean trustAnySSLCertificate, FilePath storePath)
 			throws IOException, InterruptedException {
-		CloseableHttpResponse resp = null;
-		HttpGet httpGet = new HttpGet(url);
-		String body = "";
-		try {
-			resp = client.execute(httpGet);
-			body = EntityUtils.toString(resp.getEntity());
-		} finally {
-			if (resp != null) {
-				resp.close();
-			}
+		try(CloseableHttpResponse response = RestClient.executeGet(url, currentUsername, currentPassword, trustAnySSLCertificate, null)){
+			String body = EntityUtils.toString(response.getEntity());
+			storePath.write(body, "UTF-8");
 		}
-		storePath.write(body, "UTF-8");
+
+	}
+
+	private String getCurrentHost() {
+		return isUseCustomRegistry() ? super.getHost() : DevTestPluginConfiguration.get().getHost();
+	}
+
+	private String getCurrentPort() {
+		return isUseCustomRegistry() ? super.getPort() : DevTestPluginConfiguration.get().getPort();
+	}
+
+	private String getCurrentProtocol() {
+		return isUseCustomRegistry() ? (isSecured() ? "https" : "http") : (DevTestPluginConfiguration.get().isSecured() ? "https" : "http");
+	}
+
+	private boolean getTrustAnySSLCertificate() {
+		return isUseCustomRegistry() ? super.isTrustAnySSLCertificate() : DevTestPluginConfiguration.get().isTrustAnySSLCertificate();
+	}
+
+	private void validateRequiredMarFilePath() throws AbortException {
+		if (marFilePath == null || marFilePath.isEmpty()) {
+			throw new AbortException(Messages.DevTestDeployTest_missing_mar());
+		}
+	}
+
+	private String getCurrentUsername() {
+		return isUseCustomRegistry() ? super.getUsername() : DevTestPluginConfiguration.get().getUsername();
+	}
+
+	private String getCurrentPassword() {
+		return isUseCustomRegistry() ? super.getPassword().getPlainText() : DevTestPluginConfiguration.get().getPassword().getPlainText();
+	}
+
+	private String resolveParameter(String param, Run<?, ?> run, TaskListener listener) throws IOException, InterruptedException {
+		if (StringUtils.isNotEmpty(param)) {
+			List<String> resParamFilePath = Utils.resolveParameters(Collections.singletonList(param), run, listener);
+			return resParamFilePath.get(0);
+		}
+		return null;
+	}
+
+	private String sendPostRequestAndGetItemId(String itemUrl, String currentUsername, String currentPassword, boolean trustAnySSLCertificate, HttpEntity entity, TaskListener listener) throws IOException{
+		try (CloseableHttpResponse response = RestClient.executePost(itemUrl, currentUsername, currentPassword, trustAnySSLCertificate, entity, null)) {
+			int statusCode = response.getStatusLine().getStatusCode();
+			String responseBody = EntityUtils.toString(response.getEntity());
+			if (statusCode == 200) {
+				listener.getLogger().println(Messages.DevTestPlugin_responseBody(responseBody));
+			} else {
+				listener.getLogger().println(Messages.DevTestDeployTest_error());
+				throw new AbortException(Messages.DevTestPlugin_responseStatus(statusCode, responseBody));
+			}
+			return parseResponseForId(responseBody);
+		}
+	}
+
+	private void logSuccessMessage(String runItemId, TaskListener listener) {
+		listener.getLogger().println(Messages.DevTestDeployTest_success(runItemId));
+	}
+	private void logRunItemStatus(String runItemStatus, TaskListener listener) {
+		listener.getLogger().println(Messages.DevTestDeployTest_status(runItemStatus));
+	}
+
+	private void downloadReportsAndSetRunResult(String runItemStatus, String runItemId, URLFactory urlFactory, String currentUsername, String currentPassword, boolean trustAnySSLCertificate, FilePath workDir, Run<?, ?> run, TaskListener listener) throws IOException, InterruptedException {
+		if (isTest()) {
+			downloadTestOutput(urlFactory, currentUsername, currentPassword, trustAnySSLCertificate,
+					new FilePath(workDir, "report/" + runItemId + "/tests/case"), runItemId);
+		} else {
+			downloadSuiteOutput(urlFactory, currentUsername, currentPassword, trustAnySSLCertificate,
+					new FilePath(workDir, "report/" + runItemId + "/suites/suite"), runItemId, listener.getLogger());
+		}
+
+		setResultBasedOnStatus(runItemStatus, run, listener);
+
+		printStatusDetails(runItemId, run, listener);
+	}
+
+	private void setResultBasedOnStatus(String runItemStatus, Run<?, ?> run, TaskListener listener) {
+		if (runItemStatus.equalsIgnoreCase("FAILED")) {
+			listener.getLogger().println("Test run result: UNSTABLE");
+			run.setResult(Result.UNSTABLE);
+		} else if (runItemStatus.equalsIgnoreCase("ABORTED") || runItemStatus.equalsIgnoreCase("FAILED_TO_STAGE")) {
+			listener.getLogger().println("Test run result: FAILURE");
+			run.setResult(Result.FAILURE);
+		} else {
+			listener.getLogger().println("Test run result: SUCCESS");
+			run.setResult(Result.SUCCESS);
+		}
+	}
+
+	private void printStatusDetails(String runItemId, Run<?, ?> run, TaskListener listener) {
+		Report report = new TestInvokeApiResultParser(listener.getLogger())
+				.parseStep(run.getRootDir().toString() + "/report/" + runItemId);
+		listener.getLogger().println(Messages.DevTestDeployTest_statusDetails(report.getTotalCount(),
+				report.getSuccessfullTests().size(), report.getFailCount()));
 	}
 
 }

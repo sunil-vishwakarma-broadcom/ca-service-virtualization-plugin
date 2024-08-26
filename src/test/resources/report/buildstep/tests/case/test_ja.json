@@ -1,0 +1,116 @@
+{
+  "_links": {
+    "next": {
+      "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/tests/reports/EAC6BDD9E5AF11E7BADA020027E349EE/cycles 場[[BUMN0]]"
+    },
+    "self": {
+      "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/tests/reports/EAC6BDD9E5AF11E7BADA020027E349EE 場[[BUMO0]]"
+    }
+  },
+  "testRunUniqueId": "表 0000BDD9E5AF11E7BADA020027E349EE 場[[BUMP0]]",
+  "testRunName": "表 SuccessfullTest 場[[BUMQ0]]",
+  "testcaseId": "表 00000A755B1A11E58280005056C00008 場[[BUMR0]]",
+  "testcaseName": "表 test-data-driven-http-rest 場[[BUMS0]]",
+  "testCaseDoc": "表 Put documentation of the Test Case here. 場[[BUMT0]]",
+  "startTime": "表 2017-12-20T13:02:20-0500 場[[BUMU0]]",
+  "endTime": "表 2017-12-20T13:02:25-0500 場[[BUMV0]]",
+  "elapsedTimeInMillSec": 5505,
+  "user": "表 admin 場[[D6Q0]]",
+  "endedState": "表 PASSED 場[[BUMW0]]",
+  "done": true,
+  "manuallyTerminated": false,
+  "passCount": 1,
+  "failCount": 0,
+  "warningCount": 0,
+  "abortCount": 0,
+  "passPercent": 100,
+  "failPercent": 0,
+  "abortPercent": 0,
+  "modelName": "表 test-data-driven-http-rest 場[[BUMX0]]",
+  "loadPattern": "表 Run N Times 場[[BUMY0]]",
+  "host": "表 localhost 場[[BUMZ0]]",
+  "simulatorName": "表 tcp://localhost:2014/Simulator 場[[BUM20]]",
+  "coordinatorId": "表 em2ApF_ybUIQTNajqcZsP_r7rh-6qHabQ-UkOHfSBn0W 場[[BUM30]]",
+  "coordinatorName": "表 tcp://localhost:2011/Coordinator 場[[BUM40]]",
+  "config": "表 /root/lisatmp_10.2.5/lads/EAC6BDD9E5AF11E7BADA020027E349EE/Bank v5/Configs/project.config 場[[BUM50]]",
+  "ssvUsers": "表 1 場[[D6R0]]",
+  "testcase": {
+    "id": "表 AFCE7A755B1A11E58280005056C00008 場[[BUM60]]",
+    "name": "表 test-data-driven-http-rest 場[[BUM70]]",
+    "documentation": "表 Put documentation of the Test Case here. 場[[BUNA0]]",
+    "resultState": "",
+    "steps": [
+      {
+        "uid": "表 B4D3B9F75B1A11E58280005056C00008 場[[BUNB0]]",
+        "name": "表 http GET /3/movie/49047/ 場[[BUNC0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.ws.rest.RESTNode 場[[BUND0]]",
+        "quiet": false,
+        "next": "表 http GET /3/movie/49163 場[[BUNE0]]"
+      },
+      {
+        "uid": "表 B4D3B9F75B1A11E58280005056C00008 場[[BUNB0]]",
+        "name": "表 http GET /3/movie/49163 場[[BUNF0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.ws.rest.RESTNode 場[[BUND0]]",
+        "quiet": false,
+        "next": "表 http GET /3/movie/49381 場[[BUNG0]]"
+      },
+      {
+        "uid": "表 B4D3B9F75B1A11E58280005056C00008 場[[BUNB0]]",
+        "name": "表 http GET /3/movie/49381 場[[BUNH0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.ws.rest.RESTNode 場[[BUND0]]",
+        "quiet": false,
+        "next": "表 GET empty column value 場[[BUNI0]]"
+      },
+      {
+        "uid": "表 B0CEBA81908F11E6B40D60F81DD00CF4 場[[BUNJ0]]",
+        "name": "表 GET empty column value 場[[BUNK0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.ws.rest.RESTNode 場[[BUND0]]",
+        "quiet": false,
+        "next": "表 http GET /3/movie/notfound 場[[BUNL0]]"
+      },
+      {
+        "uid": "表 B4D3B9F75B1A11E58280005056C00008 場[[BUNB0]]",
+        "name": "表 http GET /3/movie/notfound 場[[BUNM0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.ws.rest.RESTNode 場[[BUND0]]",
+        "quiet": false,
+        "next": "表 end 場[[D6S0]]"
+      },
+      {
+        "uid": "表 AFCE7A775B1A11E58280005056C00008 場[[BUNN0]]",
+        "name": "表 abort 場[[D6T0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.test.AbortStep 場[[BUNO0]]",
+        "quiet": true,
+        "next": ""
+      },
+      {
+        "uid": "表 AFCE7A795B1A11E58280005056C00008 場[[BUNP0]]",
+        "name": "表 fail 場[[D6U0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.test.Abend 場[[BUNQ0]]",
+        "quiet": true,
+        "next": "表 abort 場[[D6V0]]"
+      },
+      {
+        "uid": "表 AFCE7A7B5B1A11E58280005056C00008 場[[BUNR0]]",
+        "name": "表 end 場[[D6W0]]",
+        "documentation": null,
+        "type": "表 com.itko.lisa.test.NormalEnd 場[[BUNS0]]",
+        "quiet": true,
+        "next": "表 fail 場[[D6X0]]"
+      }
+    ]
+  },
+  "stagingDocument": {
+    "name": "表 Run1User1Cycle 場[[BUNT0]]",
+    "documentation": "",
+    "distributionType": "表 com.itko.lisa.coordinator.runpatterns.PercentDistribution 場[[BUNU0]]",
+    "loadPatternType": "表 com.itko.lisa.coordinator.runpatterns.RunNTimesPattern 場[[BUNV0]]",
+    "think": "表 100 場[[D6Y0]]"
+  }
+}

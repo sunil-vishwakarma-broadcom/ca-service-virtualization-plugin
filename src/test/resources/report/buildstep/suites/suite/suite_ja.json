@@ -1,0 +1,31 @@
+{
+  "_links": {
+    "self": {
+      "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/{SuiteRunId} 場[[BUJ50]]"
+    },
+    "tests": {
+      "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/{SuiteRunId}/tests 場[[BUJ60]]"
+    }
+  },
+  "suiteRunId":"表 6D95487DD9D911E79CB1DCA90492F169 場[[BUJ70]]",
+  "suiteName":"表 AllTestsSuite 場[[BUKA0]]",
+  "documentation" : "表 Put documentation of the suite here. 場[[BUKB0]]",
+  "startTime": "表 2018-05-22T10:05:25-0400 場[[BUKC0]]",
+  "endTime": "表 2018-05-22T10:05:35-0400 場[[BUKD0]]",
+  "elapsedTimeInMillSec": 9887,
+  "user": "表 admin 場[[D6B0]]",
+  "endedState": "表 PASSED 場[[BUKE0]]",
+  "endedStateValue": "表 0 場[[D6C0]]",
+  "done": true,
+  "manuallyTerminated": false,
+  "passCount": 0,
+  "failCount": 0,
+  "warningCount": 0,
+  "abortCount": 1,
+  "errorCount": 1,
+  "totalTestsExecuted": 10,
+  "totalTests": 0,
+  "host": "表 chedi02mac1636.ca.com 場[[BUKF0]]",
+  "config": "表 C:\\PROGRA~1\\CA\\DevTest\\lisatmp_10.3.0\\lads\\2C81BEA15DC911E8A5A80050569C3565\\examples\\Configs\\project.config 場[[BUKG0]]",
+  "path": "表 C:\\PROGRA~1\\CA\\DevTest\\lisatmp_10.3.0\\lads\\2C81BEA15DC911E8A5A80050569C3565\\examples\\Suites\\testsuite.ste 場[[BUKH0]]"
+}

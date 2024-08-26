@@ -25,35 +25,32 @@
 
 package com.ca.devtest.jenkins.plugin.buildstep;
 
-import static com.ca.devtest.jenkins.plugin.util.Utils.createBasicAuthHeader;
-
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
+import com.ca.devtest.jenkins.plugin.config.RestClient;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
+import com.ca.devtest.jenkins.plugin.util.URLFactory;
 import com.ca.devtest.jenkins.plugin.util.Utils;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Item;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.FormValidation;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.AncestorInPath;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Build step for starting virtual service.
@@ -62,186 +59,182 @@ import org.kohsuke.stapler.AncestorInPath;
  */
 public class DevTestStartVs extends DefaultBuildStep {
 
-	private String vseName;
-	private List<String> vsNames;
-	private String separator;
+    private final String vseName;
+    private final List<String> vsNames;
+    private String separator;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param useCustomRegistry if we are overriding default Registry
-	 * @param host              host for custom Registry
-	 * @param port              port for custom Registry
-	 * @param vseName           name of VSE where we want to undeploy the VS
-	 * @param vsNames           names of the VSs delimetered by ,
-	 * @param tokenCredentialId credentials token id
-	 * @param secured           if https should be for custom registry
-	 */
-	@DataBoundConstructor
-	public DevTestStartVs(boolean useCustomRegistry, String host, String port, String vseName,
-			String vsNames, String tokenCredentialId, boolean secured) {
-		super(useCustomRegistry, host, port, tokenCredentialId, secured);
-		this.vseName = vseName;
-		if (vsNames != null && !vsNames.isEmpty()) {
-			if (vsNames.contains(",")) {
-				this.vsNames = Arrays.asList(vsNames.split("\\s*,\\s*"));
-				this.separator = ", ";
-			} else {
-				this.vsNames = Arrays.asList(vsNames.split("\\s*\n\\s*"));
-				this.separator = "\n";
-			}
-		} else {
-			this.vsNames = new ArrayList<String>();
-		}
-	}
+    /**
+     * Constructor.
+     *
+     * @param useCustomRegistry if we are overriding default Registry
+     * @param host              host for custom Registry
+     * @param port              port for custom Registry
+     * @param vseName           name of VSE where we want to undeploy the VS
+     * @param vsNames           names of the VSs delimetered by ,
+     * @param tokenCredentialId credentials token id
+     * @param secured           if https should be for custom registry
+     */
+    @DataBoundConstructor
+    public DevTestStartVs(boolean useCustomRegistry, String host, String port, String vseName,
+                          String vsNames, String tokenCredentialId, boolean secured, boolean trustAnySSLCertificate) {
+        super(useCustomRegistry, host, port, tokenCredentialId, secured, trustAnySSLCertificate);
+        this.vseName = vseName;
+        if (vsNames != null && !vsNames.isEmpty()) {
+            if (vsNames.contains(",")) {
+                this.vsNames = Arrays.asList(vsNames.split("\\s*,\\s*"));
+                this.separator = ", ";
+            } else {
+                this.vsNames = Arrays.asList(vsNames.split("\\s*\n\\s*"));
+                this.separator = "\n";
+            }
+        } else {
+            this.vsNames = new ArrayList<String>();
+        }
+    }
 
-	public String getVseName() {
-		return vseName;
-	}
+    public String getVseName() {
+        return vseName;
+    }
 
-	public String getVsNames() {
-		return StringUtils.join(vsNames, separator);
-	}
+    public String getVsNames() {
+        return StringUtils.join(vsNames, separator);
+    }
 
-	@Override
-	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace,
-			@Nonnull Launcher launcher, @Nonnull TaskListener listener)
-			throws InterruptedException, IOException {
-		Utils.checkRegistryEndpoint(this);
-		this.updateCredentails(run);
+    @Override
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace,
+                        @Nonnull Launcher launcher, @Nonnull TaskListener listener)
+            throws InterruptedException, IOException {
+        Utils.checkRegistryEndpoint(this);
+        this.updateCredentails(run);
 
-		String currentHost = isUseCustomRegistry() ? super.getHost()
-				: DevTestPluginConfiguration.get().getHost();
-		currentHost = Utils.resolveParameter(currentHost, run, listener);
+        String currentHost = isUseCustomRegistry() ? super.getHost()
+                : DevTestPluginConfiguration.get().getHost();
+        currentHost = Utils.resolveParameter(currentHost, run, listener);
 
-		String currentPort = isUseCustomRegistry() ? super.getPort()
-				: DevTestPluginConfiguration.get().getPort();
-		currentPort = Utils.resolveParameter(currentPort, run, listener);
+        String currentPort = isUseCustomRegistry() ? super.getPort()
+                : DevTestPluginConfiguration.get().getPort();
+        currentPort = Utils.resolveParameter(currentPort, run, listener);
 
-		String currentUsername = isUseCustomRegistry() ? super.getUsername()
-				: DevTestPluginConfiguration.get().getUsername();
-		String currentPassword = isUseCustomRegistry() ? super.getPassword().getPlainText()
-				: DevTestPluginConfiguration.get().getPassword().getPlainText();
+        String currentUsername = isUseCustomRegistry() ? super.getUsername()
+                : DevTestPluginConfiguration.get().getUsername();
+        String currentPassword = isUseCustomRegistry() ? super.getPassword().getPlainText()
+                : DevTestPluginConfiguration.get().getPassword().getPlainText();
 
-		String currentProtocol;
-		if (isUseCustomRegistry()) {
-			currentProtocol = isSecured() ? "https://" : "http://";
-		} else {
-			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
-		}
+        String currentProtocol;
+        if (isUseCustomRegistry()) {
+            currentProtocol = isSecured() ? "https" : "http";
+        } else {
+            currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https" : "http";
+        }
+        boolean trustAnySSLCertificate = isUseCustomRegistry() ? super.isTrustAnySSLCertificate() : DevTestPluginConfiguration.get().isTrustAnySSLCertificate();
 
-		if (vseName == null || vseName.isEmpty()) {
-			throw new AbortException(Messages.DevTestPlugin_emptyVseName());
-		}
-		if (vsNames == null || vsNames.isEmpty()) {
-			throw new AbortException(Messages.DevTestPlugin_emptyVsNames());
-		}
+        if (vseName == null || vseName.isEmpty()) {
+            throw new AbortException(Messages.DevTestPlugin_emptyVseName());
+        }
+        if (vsNames == null || vsNames.isEmpty()) {
+            throw new AbortException(Messages.DevTestPlugin_emptyVsNames());
+        }
 
-		String resolvedVseName = Utils.resolveParameter(vseName, run, listener);
+        String resolvedVseName = Utils.resolveParameter(vseName, run, listener);
 
-		List<String> resolvedVsNames = Utils.resolveParameters(vsNames, run, listener);
+        List<String> resolvedVsNames = Utils.resolveParameters(vsNames, run, listener);
 
-		for (String vsName : resolvedVsNames) {
-			listener.getLogger()
-							.println(Messages.DevTestStartVs_starting(vsName, resolvedVseName));
-			listener.getLogger()
-							.println(Messages.DevTestPlugin_devTestLocation(currentHost, currentPort));
+        for (String vsName : resolvedVsNames) {
+            listener.getLogger()
+                    .println(Messages.DevTestStartVs_starting(vsName, resolvedVseName));
+            listener.getLogger()
+                    .println(Messages.DevTestPlugin_devTestLocation(currentHost, currentPort));
 
-			String urlPath = "/api/Dcm/VSEs/" + resolvedVseName + "/" + vsName + "/actions/start/";
+            String urlPath = String.format(APIEndpoints.START_VS, resolvedVseName, vsName);
 
-			HttpPost httpPost = new HttpPost(currentProtocol + currentHost + ":" + currentPort + urlPath);
-			httpPost.addHeader("Authorization", createBasicAuthHeader(currentUsername, currentPassword));
-			httpPost.addHeader("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
+            Map<String, String> headers = Collections.singletonMap("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
+            String startVSUrl = new URLFactory(currentProtocol, currentHost, currentPort).buildUrl(urlPath);
 
-			try (CloseableHttpClient client = HttpClients.createDefault();
-					CloseableHttpResponse response = client.execute(httpPost)) {
+            try (CloseableHttpResponse response = RestClient.executePost(startVSUrl, currentUsername, currentPassword, trustAnySSLCertificate, null, headers)) {
 
-				String responseBody = EntityUtils.toString(response.getEntity());
-				int statusCode = response.getStatusLine().getStatusCode();
+                String responseBody = EntityUtils.toString(response.getEntity());
+                int statusCode = response.getStatusLine().getStatusCode();
 
-				// This is a workaround because DevTest API return 200 with empty body for wrong credentials
-				if (statusCode == 200 && responseBody.isEmpty()) {
-					// Invalid credentials for some REASON.....
-					listener.getLogger().println(Messages.DevTestStartVs_error(vsName));
-					throw new AbortException(Messages.DevTestPlugin_invalidCredentials());
-				} else if (statusCode == 200) {
-					// Everything is ok
-					listener.getLogger().println(Messages.DevTestPlugin_responseBody(responseBody));
-					listener.getLogger().println(Messages.DevTestStartVs_success(vsName, resolvedVseName));
-				} else {
-					// Some other problem
-					listener.getLogger().println(Messages.DevTestStartVs_error(vsName));
-					throw new AbortException(Messages.DevTestPlugin_responseStatus(statusCode, responseBody));
-				}
-			}
-		}
-	}
+                // This is a workaround because DevTest API return 200 with empty body for wrong credentials
+                if (statusCode == 200 && responseBody.isEmpty()) {
+                    // Invalid credentials for some REASON.....
+                    listener.getLogger().println(Messages.DevTestStartVs_error(vsName));
+                    throw new AbortException(Messages.DevTestPlugin_invalidCredentials());
+                } else if (statusCode == 200) {
+                    // Everything is ok
+                    listener.getLogger().println(Messages.DevTestPlugin_responseBody(responseBody));
+                    listener.getLogger().println(Messages.DevTestStartVs_success(vsName, resolvedVseName));
+                } else {
+                    // Some other problem
+                    listener.getLogger().println(Messages.DevTestStartVs_error(vsName));
+                    throw new AbortException(Messages.DevTestPlugin_responseStatus(statusCode, responseBody));
+                }
+            }
+        }
+    }
 
-	// Localization -> Messages generated by maven plugin check target folder
-	@Symbol("svStartVirtualService")
-	@Extension
-	public static final class DescriptorImpl extends DefaultDescriptor {
+    // Localization -> Messages generated by maven plugin check target folder
+    @Symbol("svStartVirtualService")
+    @Extension
+    public static final class DescriptorImpl extends DefaultDescriptor {
 
-		/**
-		 * Checker for VSE name input.
-		 *
-		 * @param vseName VSE name
-		 *
-		 * @return form validation
-		 */
-		public FormValidation doCheckVseName(@QueryParameter String vseName) {
-			if (vseName.length() == 0) {
-				return FormValidation.error(Messages.DevTestPlugin_DescriptorImpl_MissingVse());
-			}
-			return FormValidation.ok();
-		}
+        /**
+         * Checker for VSE name input.
+         *
+         * @param vseName VSE name
+         * @return form validation
+         */
+        public FormValidation doCheckVseName(@QueryParameter String vseName) {
+            if (vseName.length() == 0) {
+                return FormValidation.error(Messages.DevTestPlugin_DescriptorImpl_MissingVse());
+            }
+            return FormValidation.ok();
+        }
 
-		/**
-		 * Checker for VS name input.
-		 *
-		 * @param vsNames VS name
-		 *
-		 * @return form validation
-		 */
-		public FormValidation doCheckVsNames(@QueryParameter String vsNames) {
-			if (vsNames.length() == 0) {
-				return FormValidation
-						.error(Messages.DevTestPlugin_DescriptorImpl_MissingVs());
-			}
+        /**
+         * Checker for VS name input.
+         *
+         * @param vsNames VS name
+         * @return form validation
+         */
+        public FormValidation doCheckVsNames(@QueryParameter String vsNames) {
+            if (vsNames.length() == 0) {
+                return FormValidation
+                        .error(Messages.DevTestPlugin_DescriptorImpl_MissingVs());
+            }
 
-			return FormValidation.ok();
-		}
+            return FormValidation.ok();
+        }
 
-		/**
-		 * Checker for host inputs for Registry.
-		 *
-		 * @param useCustomRegistry if custom Registry endpoint should used
-		 * @param host              host for Registry
-		 * @param port              port for Registry
-		 * @param tokenCredentialId credentials token id
-		 *
-		 * @return form validation
-		 */
-		public FormValidation doCheckHost(@AncestorInPath Item context, @QueryParameter boolean useCustomRegistry,
-				@QueryParameter String host, @QueryParameter String port,
-				@QueryParameter String tokenCredentialId) {
-			return Utils.doCheckHost(context, useCustomRegistry, host, port, tokenCredentialId);
-		}
+        /**
+         * Checker for host inputs for Registry.
+         *
+         * @param useCustomRegistry if custom Registry endpoint should used
+         * @param host              host for Registry
+         * @param port              port for Registry
+         * @param tokenCredentialId credentials token id
+         * @return form validation
+         */
+        public FormValidation doCheckHost(@AncestorInPath Item context, @QueryParameter boolean useCustomRegistry,
+                                          @QueryParameter String host, @QueryParameter String port,
+                                          @QueryParameter String tokenCredentialId) {
+            return Utils.doCheckHost(context, useCustomRegistry, host, port, tokenCredentialId);
+        }
 
-		@Override
-		public boolean isApplicable(Class<? extends AbstractProject> abstractClass) {
-			return true;
-		}
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> abstractClass) {
+            return true;
+        }
 
-		/**
-		 * Method used for setting name of the component in Jenkins GUI. In this case it is name of
-		 * build step for starting VS.
-		 *
-		 * @return name of build step
-		 */
-		@Override
-		public String getDisplayName() {
-			return Messages.DevTestStartVs_DescriptorImpl_DisplayName();
-		}
-	}
+        /**
+         * Method used for setting name of the component in Jenkins GUI. In this case it is name of
+         * build step for starting VS.
+         *
+         * @return name of build step
+         */
+        @Override
+        public String getDisplayName() {
+            return Messages.DevTestStartVs_DescriptorImpl_DisplayName();
+        }
+    }
 }

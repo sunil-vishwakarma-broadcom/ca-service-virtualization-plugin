@@ -27,6 +27,7 @@ package com.ca.devtest.jenkins.plugin.buildstep;
 
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
 import com.ca.devtest.jenkins.plugin.data.CreateAndDeployVsData;
 import com.ca.devtest.jenkins.plugin.data.DevTestReturnValue;
 import com.ca.devtest.jenkins.plugin.slavecallable.DevTestCreateAndDeployVsCallable;
@@ -85,13 +86,14 @@ public class DevTestCreateAndDeployVs extends DefaultBuildStep {
 	 * @param dataFiles         patch to data files to be uploaded.
 	 * @param tokenCredentialId credentials token id
 	 * @param secured           if https should be for custom registry
+	 * @param trustAnySSLCertificate  trust all certificate
 	 */
 	@DataBoundConstructor
 	public DevTestCreateAndDeployVs(boolean useCustomRegistry, String host, String port, String vseName,
 									String config, String deploy, String undeploy, String inputFile1, String inputFile2, String activeConfig, String dataFiles,
 									String swaggerurl, String ramlurl, String wadlurl, String tokenCredentialId,
-									boolean secured) {
-		super(useCustomRegistry, host, port, tokenCredentialId, secured);
+									boolean secured, boolean trustAnySSLCertificate) {
+		super(useCustomRegistry, host, port, tokenCredentialId, secured, trustAnySSLCertificate);
 		this.vseName = vseName;
 		this.config = config;
 		this.deploy = deploy;
@@ -178,10 +180,11 @@ public class DevTestCreateAndDeployVs extends DefaultBuildStep {
 
 		String currentProtocol;
 		if (isUseCustomRegistry()) {
-			currentProtocol = isSecured() ? "https://" : "http://";
+			currentProtocol = isSecured() ? "https" : "http";
 		} else {
-			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
+			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https" : "http";
 		}
+		boolean trustAnySSLCertificate = isUseCustomRegistry() ? super.isTrustAnySSLCertificate(): DevTestPluginConfiguration.get().isTrustAnySSLCertificate();
 
 		String currentUsername = isUseCustomRegistry() ? super.getUsername()
 				: DevTestPluginConfiguration.get().getUsername();
@@ -189,7 +192,8 @@ public class DevTestCreateAndDeployVs extends DefaultBuildStep {
 				: DevTestPluginConfiguration.get().getPassword().getPlainText();
 
 		String resolvedVseName = Utils.resolveParameter(vseName, run, listener);
-		String urlPath = "/lisa-virtualize-invoke/api/v3/vses/" + resolvedVseName + "/services";
+
+		String urlPath = String.format(APIEndpoints.SERVICES, resolvedVseName);
 
 		String resolvedConfig = Utils.resolveParameter(getConfig(), run, listener);
 		String resolvedDeploy = Utils.resolveParameter(getDeploy(), run, listener);
@@ -202,7 +206,7 @@ public class DevTestCreateAndDeployVs extends DefaultBuildStep {
 		String resolvedRamlUrl = Utils.resolveParameter(getRamlurl(), run, listener);
 		String resolvedWadlUrl = Utils.resolveParameter(getWadlurl(), run, listener);
 
-		CreateAndDeployVsData createVsdata = new CreateAndDeployVsData(currentHost, currentPort, currentProtocol,
+		CreateAndDeployVsData createVsdata = new CreateAndDeployVsData(currentHost, currentPort, currentProtocol, trustAnySSLCertificate,
 				currentUsername, currentPassword, resolvedVseName, urlPath, resolvedConfig, Boolean.parseBoolean(resolvedDeploy),
 				Boolean.parseBoolean(resolvedUndeploy), resolvedInputFile1Path, resolvedInputFile2Path, resolvedActiveConfig,
 				resolvedDataFiles, resolvedSwaggerUrl, resolvedRamlUrl, resolvedWadlUrl);

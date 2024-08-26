@@ -253,6 +253,6 @@ public class DevTestStopVsTest extends AbstractDevTestBuildStepTest {
 
 	private DevTestStopVs createPlugin(boolean useCustomRegistry, String host, String port,
 			String vseName, String vsNames, String tokenId) {
-		return new DevTestStopVs(useCustomRegistry, host, port, vseName, vsNames, tokenId, false);
+		return new DevTestStopVs(useCustomRegistry, host, port, vseName, vsNames, tokenId, false, false);
 	}
 }

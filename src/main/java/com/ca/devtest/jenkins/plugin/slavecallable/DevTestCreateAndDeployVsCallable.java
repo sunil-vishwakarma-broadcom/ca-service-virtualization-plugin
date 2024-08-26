@@ -26,43 +26,31 @@
 package com.ca.devtest.jenkins.plugin.slavecallable;
 
 import com.ca.devtest.jenkins.plugin.Messages;
+import com.ca.devtest.jenkins.plugin.config.RestClient;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
 import com.ca.devtest.jenkins.plugin.data.CreateAndDeployVsData;
 import com.ca.devtest.jenkins.plugin.data.DevTestReturnValue;
-import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
-import hudson.FilePath;
-import hudson.model.TaskListener;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.FormBodyPart;
-import org.apache.http.entity.mime.FormBodyPartBuilder;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-
-import com.google.gson.Gson;
+import com.ca.devtest.jenkins.plugin.exception.InvalidInputException;
+import com.ca.devtest.jenkins.plugin.util.URLFactory;
+import com.ca.devtest.jenkins.plugin.util.Utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import hudson.AbortException;
+import hudson.FilePath;
+import hudson.model.TaskListener;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.EntityUtils;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URL;
-
-import hudson.AbortException;
-
-import static com.ca.devtest.jenkins.plugin.util.Utils.createBasicAuthHeader;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * DevTestCreateAndDeployVsCallable used for executing the jobs on the specified node
@@ -78,8 +66,8 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
         this.data = data;
     }
 
-
-    public DevTestReturnValue call() throws RuntimeException {
+    @Override
+    public DevTestReturnValue call(){
         DevTestReturnValue devTestReturnValue = new DevTestReturnValue();
         try {
 
@@ -94,16 +82,13 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
 
             getListener().getLogger().println(" " +Messages.DevTestPlugin_devTestLocation(data.getRegistry(), data.getPort()));
 
-            HttpPost httpPost = new HttpPost(data.getProtocol() + data.getRegistry() + ":" + data.getPort() + data.getAPIUrl());
-            httpPost.addHeader("Authorization", createBasicAuthHeader(data.getUsername(), data.getPassword()));
-            httpPost.addHeader("Accept", "application/json");
+            String createDeployVSUrl  = new URLFactory(data.getProtocol() , data.getRegistry(), data.getPort()).buildUrl(data.getAPIUrl());
 
 
             HttpEntity entity = createPostEntity();
-            if(entity != null) httpPost.setEntity(entity);
-
-            try (CloseableHttpClient client = HttpClients.createDefault();
-                 CloseableHttpResponse response = client.execute(httpPost)) {
+            Map<String, String> headers = Collections.singletonMap("Accept", "application/json");
+            getListener().getLogger().println("\n> Calling URL  "+ createDeployVSUrl);
+            try(CloseableHttpResponse response = RestClient.executePost(createDeployVSUrl, data.getUsername(), data.getPassword(), data.isTrustAnySSLCertificate(), entity, headers)){
 
                 int statusCode = response.getStatusLine().getStatusCode();
                 String responseBody = EntityUtils.toString(response.getEntity());
@@ -124,8 +109,6 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
                     devTestReturnValue.setSuccess(false);
                 }
             }
-        } catch(RuntimeException e){
-            devTestReturnValue.setMessage(e.getMessage());
         } catch(Exception e){
             devTestReturnValue.setMessage(e.getMessage());
         }
@@ -133,17 +116,17 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
     }
 
     /** Handle undeploy of existing virtual service **/
-    private void handleUndeploy()  throws IOException, InterruptedException {
+    private void handleUndeploy()  throws IOException {
         JsonElement jelement = new JsonParser().parse(data.getConfig());
         JsonObject  jobject = jelement.getAsJsonObject();
         jobject = jobject.getAsJsonObject("virtualService");
         String vsName = jobject.get("name").getAsString();
         getListener().getLogger().println("Undeploy if virtual service '"+ vsName+"' is running on VSE '" + data.getVse() + "'");
 
-        HttpDelete httpDelete = createUndeployPostEntity(vsName);
 
-        try (CloseableHttpClient client = HttpClients.createDefault();
-             CloseableHttpResponse response = client.execute(httpDelete)) {
+        String urlPath = String.format(APIEndpoints.UNDEPLOY_VS, data.getVse(), vsName);
+        String unDeployVSUrl  = new URLFactory(data.getProtocol() , data.getRegistry(), data.getPort()).buildUrl(urlPath);
+        try(CloseableHttpResponse response = RestClient.executeDelete(unDeployVSUrl, data.getUsername(), data.getPassword(), data.isTrustAnySSLCertificate())){
             int statusCode = response.getStatusLine().getStatusCode();
             String message;
             if (statusCode == 204) {
@@ -167,16 +150,6 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
         }
     }
 
-    private HttpDelete createUndeployPostEntity(String vsName) throws IOException, InterruptedException {
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
-        multipartEntityBuilder.setContentType(ContentType.MULTIPART_FORM_DATA);
-        String urlPath = "/api/Dcm/VSEs/" + data.getVse() + "/" + vsName + "/";
-        HttpDelete httpDelete = new HttpDelete(
-                data.getProtocol() + data.getRegistry() + ":" + data.getPort() + urlPath);
-        httpDelete
-                .addHeader("Authorization", createBasicAuthHeader(data.getUsername(), data.getPassword()));
-        return httpDelete;
-    }
 
 
     /**
@@ -205,82 +178,44 @@ public class DevTestCreateAndDeployVsCallable extends AbstractDevTestMasterToSla
         multipartEntityBuilder.addTextBody("config", data.getConfig());
 
         //Optional inputs
-        if(StringUtils.isNotEmpty(String.valueOf(data.isDeploy()))) {
+        if(StringUtils.isNotBlank(String.valueOf(data.isDeploy()))) {
             multipartEntityBuilder.addTextBody("deploy", String.valueOf(data.isDeploy()));
         }
-        if(data.getResolvedInputFile1Path() != null && StringUtils.isNotEmpty(data.getResolvedInputFile1Path().trim())) {
-            addBodyPart(multipartEntityBuilder, "inputFile1", data.getResolvedInputFile1Path().trim());
-        }
-        if(data.getResolvedInputFile2Path() != null && StringUtils.isNotEmpty(data.getResolvedInputFile2Path().trim())) {
-            addBodyPart(multipartEntityBuilder, "inputFile2", data.getResolvedInputFile2Path().trim());
-        }
-        if(data.getResolvedActiveConfig() != null && StringUtils.isNotEmpty(data.getResolvedActiveConfig().trim())) {
-            addBodyPart(multipartEntityBuilder, "activeConfig", data.getResolvedActiveConfig().trim());
-        }
-        if(data.getResolvedDataFiles() != null && StringUtils.isNotEmpty(data.getResolvedDataFiles().trim())) {
-            addBodyPart(multipartEntityBuilder, "dataFile", data.getResolvedDataFiles().trim());
-        }
-        if(data.getSwaggerurl() != null && StringUtils.isNotEmpty(data.getSwaggerurl().trim())) {
-            multipartEntityBuilder.addTextBody("swaggerurl", data.getSwaggerurl().trim());
+       try {
+           if (StringUtils.isNotBlank(data.getResolvedInputFile1Path())) {
+               Utils.addBodyPart(getWorkspace(), multipartEntityBuilder, "inputFile1", data.getResolvedInputFile1Path().trim());
+           }
+           if (StringUtils.isNotBlank(data.getResolvedInputFile2Path())) {
+               Utils.addBodyPart(getWorkspace(), multipartEntityBuilder, "inputFile2", data.getResolvedInputFile2Path().trim());
+           }
+           if (StringUtils.isNotBlank(data.getResolvedActiveConfig())) {
+               Utils.addBodyPart(getWorkspace(), multipartEntityBuilder, "activeConfig", data.getResolvedActiveConfig().trim());
+           }
+           if (StringUtils.isNotBlank(data.getResolvedDataFiles())) {
+               Utils.addBodyPart(getWorkspace(), multipartEntityBuilder, "dataFile", data.getResolvedDataFiles().trim());
+           }
+       }catch(InvalidInputException re){
+           String msg = re.getMessage();
+           getListener().getLogger().println( String.format("File %s is not present in the workspace of the job", msg));
+           throw new FileNotFoundException(String.format("Cannot located file with relative path %s in workspace of job", msg));
+       }
+        if(StringUtils.isNotBlank(data.getSwaggerurl())) {
+            multipartEntityBuilder.addTextBody("swaggerurl", data.getSwaggerurl());
             getListener().getLogger().println( "Swagger url: "+ data.getSwaggerurl().trim());
         }
-        if(data.getRamlurl() != null && StringUtils.isNotEmpty(data.getRamlurl().trim())) {
+        if(StringUtils.isNotBlank(data.getRamlurl())) {
             multipartEntityBuilder.addTextBody("ramlurl", data.getRamlurl().trim());
             getListener().getLogger().println( "Raml url: "+ data.getRamlurl().trim());
         }
-        if(data.getWadlurl() != null && StringUtils.isNotEmpty(data.getWadlurl().trim())) {
+        if(StringUtils.isNotBlank(data.getWadlurl())) {
             multipartEntityBuilder.addTextBody("wadlurl", data.getWadlurl().trim());
             getListener().getLogger().println( "Wadl url: "+ data.getWadlurl().trim());
         }
         return multipartEntityBuilder.build();
     }
 
-    /**
-     * Creating and adding body part from resolvedInputFilePath in MultipartEntityBuilder
-     * @param multipartEntityBuilder
-     * @param name
-     * @param resolvedInputFilePath
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    private void addBodyPart(MultipartEntityBuilder multipartEntityBuilder,String name, String resolvedInputFilePath)
-            throws IOException, InterruptedException {
-        if (StringUtils.containsIgnoreCase(resolvedInputFilePath, "file:///") ||
-                StringUtils.containsIgnoreCase(resolvedInputFilePath, "http://") ||
-                StringUtils.containsIgnoreCase(resolvedInputFilePath, "https://")) {
-            URL url = new URL(resolvedInputFilePath);
-            File file = new File(url.getFile());
 
-            //Copying content from URL to file iff using remote file (i.e. having http:// or https:// in the file path)
-            if(StringUtils.containsIgnoreCase(resolvedInputFilePath, "http://") ||
-                    StringUtils.containsIgnoreCase(resolvedInputFilePath, "https://"))
-                FileUtils.copyURLToFile(url, file);
 
-            //Creating FormBodyPart from File
-            FormBodyPart bodyPart = FormBodyPartBuilder.create().setName(name)
-                    .setBody(new FileBody(file)).build();
-            multipartEntityBuilder.addPart(bodyPart);
-        } else {
-            FilePath inputFile = getWorkspace().child(resolvedInputFilePath);
-            File file = inputFile.act(new MyFileCallable());
-            if (file != null) {
-                ContentBody cbody = null;
-                if (inputFile.isRemote()) {
-                    //we need to read remote file in advance to be available for httpclient
-                    byte[] fileData = IOUtils.toByteArray(inputFile.read());
-                    cbody = new ByteArrayBody(fileData, resolvedInputFilePath);
-                } else {
-                    cbody = new FileBody(file);
-                }
-                multipartEntityBuilder.addPart(name, cbody);
-            } else {
-                getListener().getLogger()
-                        .println("File " + resolvedInputFilePath + " is not present in the workspace of job");
-                throw new FileNotFoundException(
-                        "Cannot located file with relative path " + resolvedInputFilePath + " in workspace of job");
-            }
-        }
-    }
 
     public void logMessage( TaskListener listener, String file, String filename){
         if(file !=null && !file.isEmpty()){

@@ -252,6 +252,6 @@ public class DevTestUndeployVsTest extends AbstractDevTestBuildStepTest {
 	private DevTestUndeployVs createPlugin(boolean useCustomRegistry, String host, String port,
 			String vseName, String vsName, String tokenId) {
 		return new DevTestUndeployVs(useCustomRegistry, host, port, vseName, vsName,
-				tokenId, false);
+				tokenId, false, false);
 	}
 }

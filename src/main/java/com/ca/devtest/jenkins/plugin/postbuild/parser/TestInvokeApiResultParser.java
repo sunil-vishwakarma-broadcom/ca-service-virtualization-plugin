@@ -30,16 +30,12 @@ import com.ca.devtest.jenkins.plugin.postbuild.report.Report;
 import com.ca.devtest.jenkins.plugin.postbuild.report.TestCase;
 import com.ca.devtest.jenkins.plugin.postbuild.report.TestCycle;
 import com.ca.devtest.jenkins.plugin.postbuild.report.TestSuite;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -117,7 +113,7 @@ public class TestInvokeApiResultParser implements Parser {
 		if (report != null && report.isJsonObject()) {
 			JsonObject caseObject = report.getAsJsonObject();
 
-			TestCase testCase = new TestCase.TestCaseBuilder()
+			return new TestCase.TestCaseBuilder()
 					.withId(safelyGetStringValue(caseObject, "testRunUniqueId"))
 					.withName(safelyGetStringValue(caseObject, "testcaseName"))
 					.withState(safelyGetStringValue(caseObject, "endedState"))
@@ -126,7 +122,6 @@ public class TestInvokeApiResultParser implements Parser {
 					.withStop(safelyGetStringValue(caseObject, "endTime"))
 					.withCycles(cycles)
 					.build();
-			return testCase;
 		}
 		return null;
 	}
@@ -157,12 +152,11 @@ public class TestInvokeApiResultParser implements Parser {
 			return null;
 		}
 		JsonObject caseObject = caseElement.getAsJsonObject();
-		TestCase testCase = new TestCase.TestCaseBuilder()
+		return new TestCase.TestCaseBuilder()
 				.withId(safelyGetStringValue(caseObject, "testRunUniqueId"))
 				.withName(safelyGetStringValue(caseObject, "testcaseName"))
 				.withCycles(cycles)
 				.build();
-		return testCase;
 	}
 
 
@@ -192,7 +186,7 @@ public class TestInvokeApiResultParser implements Parser {
 			return null;
 		}
 		JsonObject cycle = cycleElement.getAsJsonObject();
-		TestCycle testCycle = new TestCycle.TestCycleBuilder()
+		return new TestCycle.TestCycleBuilder()
 				.withId(safelyGetStringValue(cycle, "cycleUniqueId"))
 				.withCycle(safelyGetStringValue(cycle, "cycle"))
 				.withElapsedTime(safelyGetStringValue(cycle, "elapsedTimeInMillSec"))
@@ -202,7 +196,6 @@ public class TestInvokeApiResultParser implements Parser {
 				.withMessages(safelyGetStringList(cycle.get("_embedded"), "messages"))
 				.withRawCycleReport(prettyParser.toJson(cycle))
 				.build();
-		return testCycle;
 	}
 
 	private String safelyGetStringValue(JsonElement element, String field) {
@@ -217,11 +210,12 @@ public class TestInvokeApiResultParser implements Parser {
 	}
 
 	private List<String> safelyGetStringList(JsonElement element, String field) {
+		List<String> result = Collections.emptyList();
 		if (element != null && field != null && element.isJsonObject()) {
 			JsonObject object = element.getAsJsonObject();
 			if (object != null && object.get(field) != null && object.get(field).isJsonArray()) {
 				JsonArray array = object.get(field).getAsJsonArray();
-				List<String> result = new ArrayList<>();
+				result = new ArrayList<>();
 				for (JsonElement item : array) {
 					if (item.getAsString() != null) {
 						result.add(item.getAsString());
@@ -230,7 +224,7 @@ public class TestInvokeApiResultParser implements Parser {
 				return result;
 			}
 		}
-		return null;
+		return result;
 	}
 
 
@@ -341,7 +335,7 @@ public class TestInvokeApiResultParser implements Parser {
 	private synchronized String readReport(String reportPath) {
 		String content = "";
 		try {
-			content = new String(Files.readAllBytes(Paths.get(reportPath)), Charset.forName("UTF-8"));
+			content = new String(Files.readAllBytes(Paths.get(reportPath)), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			logger.println(Messages.DevTestParser_FailedReadFile(reportPath));
 		}

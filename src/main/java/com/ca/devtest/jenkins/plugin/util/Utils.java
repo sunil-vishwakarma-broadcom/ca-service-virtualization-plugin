@@ -28,6 +28,7 @@ package com.ca.devtest.jenkins.plugin.util;
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
 import com.ca.devtest.jenkins.plugin.buildstep.DefaultBuildStep;
+import com.ca.devtest.jenkins.plugin.exception.InvalidInputException;
 import com.cloudbees.plugins.credentials.CredentialsMatcher;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -35,6 +36,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.AbortException;
 import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.Util;
 import hudson.model.Item;
 import hudson.model.AbstractBuild;
@@ -45,8 +47,10 @@ import hudson.util.FormValidation;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -62,7 +66,16 @@ import java.util.List;
 import java.util.Set;
 import jenkins.model.Jenkins;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.FormBodyPartBuilder;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.springframework.util.AntPathMatcher;
 import org.kohsuke.stapler.AncestorInPath;
 
@@ -335,5 +348,73 @@ public class Utils {
 			throw new AbortException(Messages.Utils_NoFilesForWildcard(wildcard));
 		}
 		return files;
+	}
+
+	public static boolean isValidPort(String portInput) {
+		try {
+			int port = Integer.parseInt(portInput);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Creating and adding body part from resolvedInputFilePath in MultipartEntityBuilder
+	 * @param multipartEntityBuilder
+	 * @param name
+	 * @param resolvedInputFilePath
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static void addBodyPart(FilePath workspace, MultipartEntityBuilder multipartEntityBuilder, String name, String resolvedInputFilePath)
+			throws IOException, InterruptedException {
+		if (isRemoteFilePath(resolvedInputFilePath)) {
+			handleRemoteFile(workspace, multipartEntityBuilder, name, resolvedInputFilePath);
+		} else {
+			handleLocalFile(workspace, multipartEntityBuilder, name, resolvedInputFilePath);
+		}
+	}
+
+	private static boolean isRemoteFilePath(String filePath) {
+		return StringUtils.containsIgnoreCase(filePath, "file:///") ||
+				StringUtils.containsIgnoreCase(filePath, "http://") ||
+				StringUtils.containsIgnoreCase(filePath, "https://");
+	}
+
+	private static void handleRemoteFile(FilePath workspace, MultipartEntityBuilder multipartEntityBuilder, String name, String resolvedInputFilePath)
+			throws IOException {
+		URL url = new URL(resolvedInputFilePath);
+		File file = new File(url.getFile());
+
+		//Copying content from URL to file iff using remote file (i.e. having http:// or https:// in the file path)
+		if (StringUtils.containsIgnoreCase(resolvedInputFilePath, "http://") ||
+				StringUtils.containsIgnoreCase(resolvedInputFilePath, "https://")) {
+			FileUtils.copyURLToFile(url, file);
+		}
+
+		//Creating FormBodyPart from File
+		FormBodyPart bodyPart = FormBodyPartBuilder.create().setName(name)
+				.setBody(new FileBody(file)).build();
+		multipartEntityBuilder.addPart(bodyPart);
+	}
+
+	private static void handleLocalFile(FilePath workspace, MultipartEntityBuilder multipartEntityBuilder, String name, String resolvedInputFilePath)
+			throws InterruptedException, IOException {
+		FilePath inputFile = workspace.child(resolvedInputFilePath);
+		File file = inputFile.act(new MyFileCallable());
+		if (file != null) {
+			ContentBody contentBody;
+			if (inputFile.isRemote()) {
+				// Reading remote file in advance to be available for HttpClient
+				byte[] fileData = IOUtils.toByteArray(inputFile.read());
+				contentBody = new ByteArrayBody(fileData, resolvedInputFilePath);
+			} else {
+				contentBody = new FileBody(file);
+			}
+			multipartEntityBuilder.addPart(name, contentBody);
+		} else {
+			throw new InvalidInputException(resolvedInputFilePath);
+		}
 	}
 }

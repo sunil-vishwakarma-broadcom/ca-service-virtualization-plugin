@@ -8,6 +8,21 @@
       <f:entry field="marFilePath" title="${%marFilePath}">
         <f:textbox/>
       </f:entry>
+      <f:entry field="stagingDocRelativePath" title="${%stagingDocRelativePath}">
+        <f:textbox/>
+      </f:entry>
+      <f:entry field="stagingDocFilePath" title="${%stagingDocFilePath}">
+        <f:textbox/>
+      </f:entry>
+      <f:entry field="configRelativePath" title="${%configRelativePath}">
+        <f:textbox/>
+      </f:entry>
+      <f:entry field="configFilePath" title="${%configFilePath}">
+        <f:textbox/>
+      </f:entry>
+      <f:entry field="coordinatorServerName" title="${%coordinatorServerName}">
+        <f:textbox/>
+      </f:entry>
     </table>
   </f:block>
 
@@ -26,6 +41,10 @@
           <c:select/>
         </f:entry>
         <f:entry title="${%Secured}" field="secured" name="secured">
+          <f:checkbox default="false">
+          </f:checkbox>
+        </f:entry>
+        <f:entry title="${%trustAnySSLCertificate}" field="trustAnySSLCertificate" name="trustAnySSLCertificate">
           <f:checkbox default="false">
           </f:checkbox>
         </f:entry>

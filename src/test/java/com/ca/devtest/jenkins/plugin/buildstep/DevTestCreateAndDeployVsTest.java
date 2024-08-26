@@ -129,7 +129,7 @@ public class DevTestCreateAndDeployVsTest extends AbstractDevTestBuildStepTest {
         project.getBuildersList().add(builder);
 
         FreeStyleBuild build = jenkins.assertBuildStatus(Result.FAILURE, project.scheduleBuild2(0));
-        jenkins.assertLogContains("ERROR: URI does not specify a valid host name", build);
+        jenkins.assertLogContains("ERROR: Invalid Port [] provided. Please provide a valid Port number.", build);
     }
 
     @Test
@@ -241,6 +241,6 @@ public class DevTestCreateAndDeployVsTest extends AbstractDevTestBuildStepTest {
                                                   String deploy, String undeploy, String inputFile1, String inputFile2, String activeConfig, String dataFiles,
                                                   String swaggerurl, String ramlurl, String wadlurl, String tokenId) {
         return new DevTestCreateAndDeployVs(useCustomRegistry, host, port, vseName, config, deploy, undeploy, inputFile1, inputFile2,
-                activeConfig, dataFiles, swaggerurl, ramlurl, wadlurl, tokenId, false);
+                activeConfig, dataFiles, swaggerurl, ramlurl, wadlurl, tokenId, false, false);
     }
 }

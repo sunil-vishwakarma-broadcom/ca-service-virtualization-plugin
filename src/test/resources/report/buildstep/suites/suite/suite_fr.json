@@ -1,0 +1,31 @@
+{
+  "_links": {
+    "self": {
+      "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/{SuiteRunId} è[[BUJ50]]"
+    },
+    "tests": {
+      "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/{SuiteRunId}/tests è[[BUJ60]]"
+    }
+  },
+  "suiteRunId":"à 6D95487DD9D911E79CB1DCA90492F169 è[[BUJ70]]",
+  "suiteName":"à AllTestsSuite è[[BUKA0]]",
+  "documentation" : "à Put documentation of the suite here. è[[BUKB0]]",
+  "startTime": "à 2018-05-22T10:05:25-0400 è[[BUKC0]]",
+  "endTime": "à 2018-05-22T10:05:35-0400 è[[BUKD0]]",
+  "elapsedTimeInMillSec": 9887,
+  "user": "à admin è[[D6B0]]",
+  "endedState": "à PASSED è[[BUKE0]]",
+  "endedStateValue": "à 0 è[[D6C0]]",
+  "done": true,
+  "manuallyTerminated": false,
+  "passCount": 0,
+  "failCount": 0,
+  "warningCount": 0,
+  "abortCount": 1,
+  "errorCount": 1,
+  "totalTestsExecuted": 10,
+  "totalTests": 0,
+  "host": "à chedi02mac1636.ca.com è[[BUKF0]]",
+  "config": "à C:\\PROGRA~1\\CA\\DevTest\\lisatmp_10.3.0\\lads\\2C81BEA15DC911E8A5A80050569C3565\\examples\\Configs\\project.config è[[BUKG0]]",
+  "path": "à C:\\PROGRA~1\\CA\\DevTest\\lisatmp_10.3.0\\lads\\2C81BEA15DC911E8A5A80050569C3565\\examples\\Suites\\testsuite.ste è[[BUKH0]]"
+}

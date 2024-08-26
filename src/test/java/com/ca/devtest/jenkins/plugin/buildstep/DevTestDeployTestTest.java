@@ -27,6 +27,7 @@ package com.ca.devtest.jenkins.plugin.buildstep;
 
 import com.ca.codesv.engine.junit4.VirtualServerRule;
 import com.ca.codesv.sdk.annotation.TransactionClassRepository;
+import com.ca.devtest.jenkins.plugin.util.MultiFileSCM;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Label;
@@ -34,7 +35,11 @@ import hudson.model.Result;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.EnvironmentVariablesNodeProperty.Entry;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -58,7 +63,7 @@ public class DevTestDeployTestTest extends AbstractDevTestBuildStepTest {
 	public void testMarFileNameEmpty() throws Exception {
 		FreeStyleProject project = jenkins.createFreeStyleProject("test1");
 		DevTestDeployTest builder = createPlugin(true, getHost(), "1505",
-				"", "tests", "id");
+				"", "", "", "","", "","tests", "id");
 		project.getBuildersList().add(builder);
 
 		FreeStyleBuild build = jenkins.assertBuildStatus(Result.FAILURE, project.scheduleBuild2(0));
@@ -72,7 +77,7 @@ public class DevTestDeployTestTest extends AbstractDevTestBuildStepTest {
 						new Entry("vse", "test"), new Entry("marfiles", "test2\ntest3"))));
 		FreeStyleProject project = jenkins.createFreeStyleProject();
 		DevTestDeployTest devTestDeployVs = createPlugin(true, getHost(), "1505",
-				"${marfiles}", "", "id");
+				"${marfiles}", "", "", "","", "","", "id");
 		project.getBuildersList().add(devTestDeployVs);
 
 		FreeStyleBuild build = jenkins.assertBuildStatus(Result.FAILURE, project.scheduleBuild2(0));
@@ -88,7 +93,7 @@ public class DevTestDeployTestTest extends AbstractDevTestBuildStepTest {
 		project.setScm(new SingleFileSCM("wrong-test.mar",
 				getClass().getResource("/wrong-test.mar")));
 		DevTestDeployTest builder = createPlugin(true, getHost(), "1505",
-				"wrong-test.mar", "tests", "id");
+				"wrong-test.mar", "", "", "","", "","tests", "id");
 		project.getBuildersList().add(builder);
 
 		FreeStyleBuild build = jenkins.assertBuildStatus(Result.FAILURE, project.scheduleBuild2(0));
@@ -105,7 +110,34 @@ public class DevTestDeployTestTest extends AbstractDevTestBuildStepTest {
 		project.setScm(new SingleFileSCM("rest-example.mar",
 				getClass().getResource("/rest-example.mar")));
 		DevTestDeployTest builder = createPlugin(true, getHost(), "1505",
-				"rest-example.mar", "tests", "id");
+				"rest-example.mar", "", "", "","", "","tests", "id");
+		project.getBuildersList().add(builder);
+
+		FreeStyleBuild build = jenkins.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0));
+		jenkins.assertLogContains("Test/Suite from MAR file was successfully deployed, id = ", build);
+		jenkins.assertLogContains("Test/Suite run finished with status: PASSED", build);
+	}
+
+	@Test
+	public void testStartTestWithAllInputs() throws Exception {
+		vs.useTransaction("startTestMarFileTest");
+		vs.useTransaction("virtualizeStartTestGetTestStatus");
+
+		FreeStyleProject project = jenkins.createFreeStyleProject("test2");
+		List<SingleFileSCM> scmLst = new ArrayList<>();
+
+		scmLst.add(new SingleFileSCM("rest-example.mar",
+				getClass().getResource("/rest-example.mar")));
+		scmLst.add(new SingleFileSCM("Run2User2Cycle.stg",
+				getClass().getResource("/Run2User2Cycle.stg")));
+		scmLst.add(new SingleFileSCM("project.config",
+				getClass().getResource("/project.config")));
+
+		MultiFileSCM multiFileSCM = new MultiFileSCM(scmLst);
+		project.setScm(multiFileSCM);
+
+		DevTestDeployTest builder = createPlugin(true, getHost(), "1505",
+				"rest-example.mar", "Tests/StagingDocs/_quick_stage_document_.stg", "Run2User2Cycle.stg", "Configs/project.config","project.config", "Coordinator","tests", "id");
 		project.getBuildersList().add(builder);
 
 		FreeStyleBuild build = jenkins.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0));
@@ -117,12 +149,11 @@ public class DevTestDeployTestTest extends AbstractDevTestBuildStepTest {
 	public void testStartSuiteMarFile() throws Exception {
 		vs.useTransaction("startTestMarFileSuite");
 		vs.useTransaction("virtualizeStartTestGetSuiteStatus");
-
 		FreeStyleProject project = jenkins.createFreeStyleProject("test3");
 		project.setScm(new SingleFileSCM("testsuite.mar",
 				getClass().getResource("/testsuite.mar")));
 		DevTestDeployTest builder = createPlugin(true, getHost(), "1505",
-				"testsuite.mar", "suites", "id");
+				"testsuite.mar", "", "", "","", "", "suites", "id");
 		project.getBuildersList().add(builder);
 
 		FreeStyleBuild build = jenkins.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0));
@@ -153,7 +184,7 @@ public class DevTestDeployTestTest extends AbstractDevTestBuildStepTest {
 	}
 
 	private DevTestDeployTest createPlugin(boolean useCustomRegistry, String host, String port,
-			String marFilesPath, String testType, String tokenId) {
-		return new DevTestDeployTest(useCustomRegistry, host, port, marFilesPath, testType, tokenId, false);
+			String marFilesPath, String tagingDocRelativePath,  String stagingDocFilePath,  String configRelativePath, String configFilePath, String coordinatorServerName, String testType, String tokenId) {
+		return new DevTestDeployTest(useCustomRegistry, host, port, marFilesPath, tagingDocRelativePath,  stagingDocFilePath,  configRelativePath, configFilePath, coordinatorServerName, testType, tokenId, false, false);
 	}
 }

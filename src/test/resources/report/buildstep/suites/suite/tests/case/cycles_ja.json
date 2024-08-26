@@ -1,0 +1,222 @@
+{
+  "_links": {
+    "self": {
+      "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles 場[[BUZS0]]"
+    }
+  },
+  "count": 10,
+  "_embedded": {
+    "CycleHistory": [
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/442F2822E5B211E7B46E020027E349EE 場[[BUZT0]]"
+          }
+        },
+        "cycleUniqueId": "表 442F2822E5B211E7B46E020027E349EE 場[[BUZU0]]",
+        "cycle": "表 0 場[[EAL0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:06-0500 場[[BUZX0]]",
+        "endTime": "表 2017-12-20T13:19:11-0500 場[[BUZY0]]",
+        "elapsedTimeInMillSec": 4443,
+        "endedState": "表 FAILED 場[[BUZZ0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/46D568F3E5B211E7B46E020027E349EE 場[[BUZ20]]"
+          }
+        },
+        "cycleUniqueId": "表 46D568F3E5B211E7B46E020027E349EE 場[[BUZ30]]",
+        "cycle": "表 1 場[[EAM0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:11-0500 場[[BUZ40]]",
+        "endTime": "表 2017-12-20T13:19:16-0500 場[[BUZ50]]",
+        "elapsedTimeInMillSec": 4839,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/49B7EF79E5B211E7B46E020027E349EE 場[[BUZ70]]"
+          }
+        },
+        "cycleUniqueId": "表 49B7EF79E5B211E7B46E020027E349EE 場[[BU2A0]]",
+        "cycle": "表 2 場[[EAN0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:16-0500 場[[BU2B0]]",
+        "endTime": "表 2017-12-20T13:19:21-0500 場[[BU2C0]]",
+        "elapsedTimeInMillSec": 4964,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4CAD88CCE5B211E7B46E020027E349EE 場[[BU2D0]]"
+          }
+        },
+        "cycleUniqueId": "表 4CAD88CCE5B211E7B46E020027E349EE 場[[BU2E0]]",
+        "cycle": "表 3 場[[EAO0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:21-0500 場[[BU2F0]]",
+        "endTime": "表 2017-12-20T13:19:25-0500 場[[BU2G0]]",
+        "elapsedTimeInMillSec": 4772,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4F85FD2FE5B211E7B46E020027E349EE 場[[BU2H0]]"
+          }
+        },
+        "cycleUniqueId": "表 4F85FD2FE5B211E7B46E020027E349EE 場[[BU2I0]]",
+        "cycle": "表 4 場[[EAP0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:25-0500 場[[BU2J0]]",
+        "endTime": "表 2017-12-20T13:19:30-0500 場[[BU2K0]]",
+        "elapsedTimeInMillSec": 4679,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/525040C2E5B211E7B46E020027E349EE 場[[BU2L0]]"
+          }
+        },
+        "cycleUniqueId": "表 525040C2E5B211E7B46E020027E349EE 場[[BU2M0]]",
+        "cycle": "表 5 場[[EAQ0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:30-0500 場[[BU2N0]]",
+        "endTime": "表 2017-12-20T13:19:34-0500 場[[BU2O0]]",
+        "elapsedTimeInMillSec": 4124,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/54C5AD95E5B211E7B46E020027E349EE 場[[BU2P0]]"
+          }
+        },
+        "cycleUniqueId": "表 54C5AD95E5B211E7B46E020027E349EE 場[[BU2Q0]]",
+        "cycle": "表 6 場[[EAR0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:34-0500 場[[BU2R0]]",
+        "endTime": "表 2017-12-20T13:19:39-0500 場[[BU2S0]]",
+        "elapsedTimeInMillSec": 5105,
+        "endedState": "表 FAILED 場[[BUZZ0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/57D0CAB8E5B211E7B46E020027E349EE 場[[BU2T0]]"
+          }
+        },
+        "cycleUniqueId": "表 57D0CAB8E5B211E7B46E020027E349EE 場[[BU2U0]]",
+        "cycle": "表 7 場[[EAS0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:39-0500 場[[BU2V0]]",
+        "endTime": "表 2017-12-20T13:19:44-0500 場[[BU2W0]]",
+        "elapsedTimeInMillSec": 4426,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5A744C6DE5B211E7B46E020027E349EE 場[[BU2X0]]"
+          }
+        },
+        "cycleUniqueId": "表 5A744C6DE5B211E7B46E020027E349EE 場[[BU2Y0]]",
+        "cycle": "表 8 場[[EAT0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:44-0500 場[[BU2Z0]]",
+        "endTime": "表 2017-12-20T13:19:48-0500 場[[BU220]]",
+        "elapsedTimeInMillSec": 4630,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "表 http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5D373D00E5B211E7B46E020027E349EE 場[[BU230]]"
+          }
+        },
+        "cycleUniqueId": "表 5D373D00E5B211E7B46E020027E349EE 場[[BU240]]",
+        "cycle": "表 9 場[[EAU0]]",
+        "run": "表 test-data-driven-http-rest [Run1User10Cycle] 場[[BUZV0]]",
+        "simulator": "表 tcp://localhost:2014/Simulator 場[[BUZW0]]",
+        "startTime": "表 2017-12-20T13:19:48-0500 場[[BU250]]",
+        "endTime": "表 2017-12-20T13:19:53-0500 場[[BU260]]",
+        "elapsedTimeInMillSec": 4470,
+        "endedState": "表 PASSED 場[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      }
+    ]
+  }
+}

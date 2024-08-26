@@ -1,0 +1,222 @@
+{
+  "_links": {
+    "self": {
+      "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles è[[BUZS0]]"
+    }
+  },
+  "count": 10,
+  "_embedded": {
+    "CycleHistory": [
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/442F2822E5B211E7B46E020027E349EE è[[BUZT0]]"
+          }
+        },
+        "cycleUniqueId": "à 442F2822E5B211E7B46E020027E349EE è[[BUZU0]]",
+        "cycle": "à 0 è[[EAL0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:06-0500 è[[BUZX0]]",
+        "endTime": "à 2017-12-20T13:19:11-0500 è[[BUZY0]]",
+        "elapsedTimeInMillSec": 4443,
+        "endedState": "à FAILED è[[BUZZ0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/46D568F3E5B211E7B46E020027E349EE è[[BUZ20]]"
+          }
+        },
+        "cycleUniqueId": "à 46D568F3E5B211E7B46E020027E349EE è[[BUZ30]]",
+        "cycle": "à 1 è[[EAM0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:11-0500 è[[BUZ40]]",
+        "endTime": "à 2017-12-20T13:19:16-0500 è[[BUZ50]]",
+        "elapsedTimeInMillSec": 4839,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/49B7EF79E5B211E7B46E020027E349EE è[[BUZ70]]"
+          }
+        },
+        "cycleUniqueId": "à 49B7EF79E5B211E7B46E020027E349EE è[[BU2A0]]",
+        "cycle": "à 2 è[[EAN0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:16-0500 è[[BU2B0]]",
+        "endTime": "à 2017-12-20T13:19:21-0500 è[[BU2C0]]",
+        "elapsedTimeInMillSec": 4964,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4CAD88CCE5B211E7B46E020027E349EE è[[BU2D0]]"
+          }
+        },
+        "cycleUniqueId": "à 4CAD88CCE5B211E7B46E020027E349EE è[[BU2E0]]",
+        "cycle": "à 3 è[[EAO0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:21-0500 è[[BU2F0]]",
+        "endTime": "à 2017-12-20T13:19:25-0500 è[[BU2G0]]",
+        "elapsedTimeInMillSec": 4772,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/4F85FD2FE5B211E7B46E020027E349EE è[[BU2H0]]"
+          }
+        },
+        "cycleUniqueId": "à 4F85FD2FE5B211E7B46E020027E349EE è[[BU2I0]]",
+        "cycle": "à 4 è[[EAP0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:25-0500 è[[BU2J0]]",
+        "endTime": "à 2017-12-20T13:19:30-0500 è[[BU2K0]]",
+        "elapsedTimeInMillSec": 4679,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/525040C2E5B211E7B46E020027E349EE è[[BU2L0]]"
+          }
+        },
+        "cycleUniqueId": "à 525040C2E5B211E7B46E020027E349EE è[[BU2M0]]",
+        "cycle": "à 5 è[[EAQ0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:30-0500 è[[BU2N0]]",
+        "endTime": "à 2017-12-20T13:19:34-0500 è[[BU2O0]]",
+        "elapsedTimeInMillSec": 4124,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/54C5AD95E5B211E7B46E020027E349EE è[[BU2P0]]"
+          }
+        },
+        "cycleUniqueId": "à 54C5AD95E5B211E7B46E020027E349EE è[[BU2Q0]]",
+        "cycle": "à 6 è[[EAR0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:34-0500 è[[BU2R0]]",
+        "endTime": "à 2017-12-20T13:19:39-0500 è[[BU2S0]]",
+        "elapsedTimeInMillSec": 5105,
+        "endedState": "à FAILED è[[BUZZ0]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/57D0CAB8E5B211E7B46E020027E349EE è[[BU2T0]]"
+          }
+        },
+        "cycleUniqueId": "à 57D0CAB8E5B211E7B46E020027E349EE è[[BU2U0]]",
+        "cycle": "à 7 è[[EAS0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:39-0500 è[[BU2V0]]",
+        "endTime": "à 2017-12-20T13:19:44-0500 è[[BU2W0]]",
+        "elapsedTimeInMillSec": 4426,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5A744C6DE5B211E7B46E020027E349EE è[[BU2X0]]"
+          }
+        },
+        "cycleUniqueId": "à 5A744C6DE5B211E7B46E020027E349EE è[[BU2Y0]]",
+        "cycle": "à 8 è[[EAT0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:44-0500 è[[BU2Z0]]",
+        "endTime": "à 2017-12-20T13:19:48-0500 è[[BU220]]",
+        "elapsedTimeInMillSec": 4630,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "à http://localhost:1505/lisa-test-invoke/api/v1/suites/reports/43FF8CEDE5B211E7BADA020027E349EE/tests/4414E9C0E5B211E7BADA020027E349EE/cycles/5D373D00E5B211E7B46E020027E349EE è[[BU230]]"
+          }
+        },
+        "cycleUniqueId": "à 5D373D00E5B211E7B46E020027E349EE è[[BU240]]",
+        "cycle": "à 9 è[[EAU0]]",
+        "run": "à test-data-driven-http-rest [Run1User10Cycle] è[[BUZV0]]",
+        "simulator": "à tcp://localhost:2014/Simulator è[[BUZW0]]",
+        "startTime": "à 2017-12-20T13:19:48-0500 è[[BU250]]",
+        "endTime": "à 2017-12-20T13:19:53-0500 è[[BU260]]",
+        "elapsedTimeInMillSec": 4470,
+        "endedState": "à PASSED è[[BUZ60]]",
+        "_embedded": {
+          "StepExecHistory": [],
+          "preCompanions": [],
+          "postCompanions": [],
+          "messages": []
+        }
+      }
+    ]
+  }
+}

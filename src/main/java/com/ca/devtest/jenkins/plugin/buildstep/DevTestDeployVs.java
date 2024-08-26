@@ -25,53 +25,33 @@
 
 package com.ca.devtest.jenkins.plugin.buildstep;
 
-import static com.ca.devtest.jenkins.plugin.util.Utils.createBasicAuthHeader;
-
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
-import com.ca.devtest.jenkins.plugin.util.MyFileCallable;
-import com.ca.devtest.jenkins.plugin.util.Utils;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
 import com.ca.devtest.jenkins.plugin.data.DeployMarData;
 import com.ca.devtest.jenkins.plugin.data.DevTestReturnValue;
 import com.ca.devtest.jenkins.plugin.slavecallable.DevTestDeployVsCallable;
-
+import com.ca.devtest.jenkins.plugin.util.Utils;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Item;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
-import java.io.File;
-import java.io.FileNotFoundException;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.io.*;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.FormBodyPart;
-import org.apache.http.entity.mime.FormBodyPartBuilder;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.AncestorInPath;
 
 /**
  * Build step for deploying virtual service.
@@ -98,8 +78,8 @@ public class DevTestDeployVs extends DefaultBuildStep {
 	 */
 	@DataBoundConstructor
 	public DevTestDeployVs(boolean useCustomRegistry, String host, String port, String vseName,
-			String marFilesPaths, String tokenCredentialId, boolean secured) {
-		super(useCustomRegistry, host, port, tokenCredentialId, secured);
+			String marFilesPaths, String tokenCredentialId, boolean secured, boolean trustAnySSLCertificate) {
+		super(useCustomRegistry, host, port, tokenCredentialId, secured, trustAnySSLCertificate);
 		if (marFilesPaths != null && !marFilesPaths.isEmpty()) {
 			if (marFilesPaths.contains(",")) {
 				this.marFilesPaths = Arrays.asList(marFilesPaths.split("\\s*,\\s*"));
@@ -147,10 +127,11 @@ public class DevTestDeployVs extends DefaultBuildStep {
 
 		String currentProtocol;
 		if (isUseCustomRegistry()) {
-			currentProtocol = isSecured() ? "https://" : "http://";
+			currentProtocol = isSecured() ? "https" : "http";
 		} else {
-			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
+			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https" : "http";
 		}
+		boolean trustAnySSLCertificate = isUseCustomRegistry() ? super.isTrustAnySSLCertificate(): DevTestPluginConfiguration.get().isTrustAnySSLCertificate();
 
 		String currentUsername = isUseCustomRegistry() ? super.getUsername()
 				: DevTestPluginConfiguration.get().getUsername();
@@ -158,14 +139,14 @@ public class DevTestDeployVs extends DefaultBuildStep {
 				: DevTestPluginConfiguration.get().getPassword().getPlainText();
 
 		String resolvedVseName = Utils.resolveParameter(vseName, run, listener);
-		String urlPath = "/api/Dcm/VSEs/" + resolvedVseName + "/actions/deployMar/";
+		String urlPath = String.format(APIEndpoints.DEPLOY_MAR, resolvedVseName);
 
 		List<String> resolvedMarFilesPaths = Utils.getFilesMatchingWildcardList(
 				Utils.resolveParameters(marFilesPaths, run, listener), workspace.absolutize().toString());
 
 		if (resolvedMarFilesPaths != null && currentHost!=null && currentPort !=null && currentProtocol != null &&
 			currentUsername !=null && currentPassword!=null && resolvedVseName!=null) {
-			DeployMarData deployMarData = new DeployMarData(currentHost, currentPort, currentProtocol,
+			DeployMarData deployMarData = new DeployMarData(currentHost, currentPort, currentProtocol, trustAnySSLCertificate,
 					currentUsername, currentPassword, resolvedVseName, resolvedMarFilesPaths, urlPath);
 
 			if ( deployMarData != null && launcher != null) {
@@ -187,48 +168,6 @@ public class DevTestDeployVs extends DefaultBuildStep {
 		throw new AbortException("Internal error while Deploying VS");
 	}
 
-	/**
-	 * Creates entity for HTTP Post request depending on provided format of path to MAR file. If path
-	 * to MAR file contains http or file prefix than form with fileURI property is used and this means
-	 * that DevTest will look for MAR file on the provided HTTP link or on its filesystem. When no
-	 * prefix is part of the path then MAR file is located in workspace of the job and we upload it as
-	 * part of request with file property.
-	 *
-	 * @param workspace workspace of job
-	 * @param listener  listener
-	 *
-	 * @return created {@link HttpEntity} for deploying VS
-	 */
-	private HttpEntity createPostEntity(FilePath workspace, TaskListener listener, String marFilePath)
-			throws IOException, InterruptedException {
-		if (StringUtils.containsIgnoreCase(marFilePath, "file") || StringUtils
-				.containsIgnoreCase(marFilePath, "http")) {
-			FormBodyPart bodyPart = FormBodyPartBuilder.create().setName("fileURI")
-																								 .setBody(new StringBody(marFilePath)).build();
-			return MultipartEntityBuilder.create().addPart(bodyPart).build();
-		} else {
-			FilePath marFile = workspace.child(marFilePath);
-			File file = marFile.act(new MyFileCallable());
-			if (file != null) {
-				ContentBody cbody = null;
-				if (marFile.isRemote()) {
-					//we need to read remote file in advance to be available for httpclient
-					byte[] data = IOUtils.toByteArray(marFile.read());
-					cbody = new ByteArrayBody(data, marFilePath);
-				} else {
-					cbody = new FileBody(file);
-				}
-				return MultipartEntityBuilder.create()
-																		 .addPart("file", cbody)
-																		 .build();
-			} else {
-				listener.getLogger()
-								.println("File " + marFilePath + " is no present in the workspace of job");
-				throw new FileNotFoundException(
-						"Cannot located file with relative path " + marFilePath + " in workspace of job");
-			}
-		}
-	}
 
 
 	// Localization -> Messages generated by maven plugin check target folder

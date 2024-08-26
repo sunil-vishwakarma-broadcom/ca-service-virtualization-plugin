@@ -25,35 +25,32 @@
 
 package com.ca.devtest.jenkins.plugin.buildstep;
 
-import static com.ca.devtest.jenkins.plugin.util.Utils.createBasicAuthHeader;
-
 import com.ca.devtest.jenkins.plugin.DevTestPluginConfiguration;
 import com.ca.devtest.jenkins.plugin.Messages;
+import com.ca.devtest.jenkins.plugin.config.RestClient;
+import com.ca.devtest.jenkins.plugin.constants.APIEndpoints;
+import com.ca.devtest.jenkins.plugin.util.URLFactory;
 import com.ca.devtest.jenkins.plugin.util.Utils;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Item;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.FormValidation;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.AncestorInPath;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Build step for stopping virtual service.
@@ -79,8 +76,8 @@ public class DevTestStopVs extends DefaultBuildStep {
 	 */
 	@DataBoundConstructor
 	public DevTestStopVs(boolean useCustomRegistry, String host, String port, String vseName,
-			String vsNames, String tokenCredentialId, boolean secured) {
-		super(useCustomRegistry, host, port, tokenCredentialId, secured);
+			String vsNames, String tokenCredentialId, boolean secured, boolean trustAnySSLCertificate) {
+		super(useCustomRegistry, host, port, tokenCredentialId, secured, trustAnySSLCertificate);
 		this.vseName = vseName;
 		if (vsNames != null && !vsNames.isEmpty()) {
 			if (vsNames.contains(", ")) {
@@ -91,7 +88,7 @@ public class DevTestStopVs extends DefaultBuildStep {
 				this.separator = "\n";
 			}
 		} else {
-			this.vsNames = new ArrayList<String>();
+			this.vsNames = new ArrayList();
 		}
 
 	}
@@ -126,10 +123,11 @@ public class DevTestStopVs extends DefaultBuildStep {
 
 		String currentProtocol;
 		if (isUseCustomRegistry()) {
-			currentProtocol = isSecured() ? "https://" : "http://";
+			currentProtocol = isSecured() ? "https" : "http";
 		} else {
-			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https://" : "http://";
+			currentProtocol = DevTestPluginConfiguration.get().isSecured() ? "https" : "http";
 		}
+		boolean trustAnySSLCertificate = isUseCustomRegistry() ? super.isTrustAnySSLCertificate(): DevTestPluginConfiguration.get().isTrustAnySSLCertificate();
 
 		if (vseName == null || vseName.isEmpty()) {
 			throw new AbortException(Messages.DevTestPlugin_emptyVseName());
@@ -148,17 +146,13 @@ public class DevTestStopVs extends DefaultBuildStep {
 			listener.getLogger()
 							.println(Messages.DevTestPlugin_devTestLocation(currentHost, currentPort));
 
-			String urlPath = "/api/Dcm/VSEs/" + resolvedVseName + "/" + vsName + "/actions/stop/";
+			String urlPath = String.format(APIEndpoints.STOP_VS, resolvedVseName, vsName);
 
-			HttpPost httpPost = new HttpPost(currentProtocol + currentHost + ":" + currentPort + urlPath);
-			httpPost.addHeader("Authorization", createBasicAuthHeader(currentUsername, currentPassword));
-			httpPost.addHeader("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
-
-			try (CloseableHttpClient client = HttpClients.createDefault();
-					CloseableHttpResponse response = client.execute(httpPost)) {
+			Map<String, String> headers = Collections.singletonMap("Accept", "application/vnd.ca.lisaInvoke.virtualService+json");
+			String startVSUrl  = new URLFactory(currentProtocol , currentHost, currentPort).buildUrl(urlPath);
+			try(CloseableHttpResponse response = RestClient.executePost(startVSUrl , currentUsername, currentPassword, trustAnySSLCertificate, null, headers)){
 				String responseBody = EntityUtils.toString(response.getEntity());
 				int statusCode = response.getStatusLine().getStatusCode();
-
 				// This is a workaround because DevTest API return 200 with empty body for wrong credentials
 				if (statusCode == 200 && responseBody.isEmpty()) {
 					// Invalid credentials for some REASON.....

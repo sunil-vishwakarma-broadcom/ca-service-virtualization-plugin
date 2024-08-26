@@ -78,7 +78,7 @@ public class DevTestPluginTest extends AbstractDevTestBuildStepTest {
 
 	private DevTestStartVs createPlugin(boolean useCustomRegistry, String host, String port,
 			String vseName, String vsName, String tokenId) {
-		return new DevTestStartVs(useCustomRegistry, host, port, vseName, vsName, tokenId, false);
+		return new DevTestStartVs(useCustomRegistry, host, port, vseName, vsName, tokenId, false, false);
 	}
 
 }

@@ -8,9 +8,10 @@ public abstract class RegistryData implements iData {
     private String password;
     private String vse;
     private String apiUrl;
+    private boolean trustAnySSLCertificate;
 
     protected RegistryData(String registry, String port, String protocol,
-                        String username, String password, String vse, String apiUrl){
+                        String username, String password, String vse, String apiUrl, boolean trustAnySSLCertificate){
         this.registry = registry;
         this.port = port;
         this.protocol = protocol;
@@ -18,6 +19,7 @@ public abstract class RegistryData implements iData {
         this.password = password;
         this.vse = vse;
         this.apiUrl = apiUrl;
+        this.trustAnySSLCertificate = trustAnySSLCertificate;
     }
 
     public String getRegistry(){
@@ -71,4 +73,14 @@ public abstract class RegistryData implements iData {
     public String getAPIUrl(){
         return apiUrl;
     }
+
+
+    public boolean isTrustAnySSLCertificate() {
+        return trustAnySSLCertificate;
+    }
+
+    public void setTrustAnySSLCertificate(boolean trustAnySSLCertificate) {
+        this.trustAnySSLCertificate = trustAnySSLCertificate;
+    }
+
 }

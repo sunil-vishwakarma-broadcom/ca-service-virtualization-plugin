@@ -17,12 +17,12 @@ public class CreateAndDeployVsData extends RegistryData {
     private String ramlurl;
     private String wadlurl;
 
-    public CreateAndDeployVsData(String registry, String port, String protocol,
+    public CreateAndDeployVsData(String registry, String port, String protocol, boolean trustAnySSLCertificate,
                                  String username, String password, String vse, String apiUrl, String config,
                                  boolean deploy, boolean undeploy, String resolvedInputFile1Path, String resolvedInputFile2Path,
                                  String resolvedActiveConfig, String resolvedDataFiles, String swaggerurl,
                                  String ramlurl, String wadlurl) {
-        super(registry, port, protocol, username, password, vse, apiUrl);
+        super(registry, port, protocol, username, password, vse, apiUrl, trustAnySSLCertificate);
         this.config = config;
         this.deploy = deploy;
         this.undeploy = undeploy;
